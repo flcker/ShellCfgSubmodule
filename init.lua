@@ -56,6 +56,7 @@ for _, file in ipairs(lua_files) do
     if not ok then
         vim.notify("Failed to load module: " .. module .. " - " .. err, vim.log.levels.ERROR)
     else
-        vim.notify("Loaded module: " .. module, vim.log.levels.DEBUG)
+        -- 调试信息，正确加载了模块时输出，可以在需要时取消注释
+        -- vim.notify("Loaded module: " .. module, vim.log.levels.DEBUG)
     end
 end
