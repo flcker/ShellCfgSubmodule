@@ -1,0 +1,32 @@
+[color]
+	ui = auto
+
+[alias]
+	# 常用缩写
+	st      = status
+	co      = checkout
+	sw      = switch
+	br      = branch
+	ci      = commit
+	wt	  	= worktree
+
+	# worktree
+	wt-add  = worktree add		# 用法：git wt-add <path> [<start-point>]，例如：git wt-add ../my-feature-branch my-feature-branch
+	wt-rm   = worktree remove	# 用法：git wt-rm <path>，例如：git wt-rm ../my-feature-branch
+	wt-ls   = worktree list		# 列出所有工作树，显示路径和关联分支
+
+	# 撤销 / 暂存
+	undo    = reset --soft HEAD~1        # 撤销最后一次提交，保留改动到工作区
+	unstage = restore --staged           # 取消暂存（保留文件修改）
+
+	# 日志
+	last    = log -1 HEAD                # 查看最近一次提交
+	lg      = log --oneline --graph --decorate --all  # 图形化 oneline 日志
+
+	# 修改提交
+	amend   = commit --amend --no-edit   # 追加暂存内容到最后一次提交，不改 message
+	squash  = "!f() { git rebase -i HEAD~${1:-2}; }; f"  # 交互式合并最近 n 个提交（默认 2）
+
+	# 工具
+	whatchanged = log --raw --no-merges  # 替代已废弃的 git whatchanged
+	aliases     = config --get-regexp alias  # 列出所有 alias
