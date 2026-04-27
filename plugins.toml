@@ -1,0 +1,28 @@
+# ─── oh-my-zsh 插件（单次 clone，多文件 source）───────────────────────────────
+[plugins.ohmyzsh]
+github = "ohmyzsh/ohmyzsh"
+use = [
+  "plugins/git/*.plugin.zsh",
+  "plugins/fzf/*.plugin.zsh",
+  "plugins/extract/*.plugin.zsh",
+]
+
+# ─── fzf-tab（必须在 syntax-highlighting 之前）────────────────────────────────
+[plugins.fzf-tab]
+github = "Aloxaf/fzf-tab"
+
+# ─── autosuggestions ─────────────────────────────────────────────────────────
+[plugins.zsh-autosuggestions]
+github = "zsh-users/zsh-autosuggestions"
+
+# ─── zoxide（替代 zoxide.zsh 中的 eval）──────────────────────────────────────
+[plugins.zoxide]
+inline = 'command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"'
+
+# ─── thefuck ─────────────────────────────────────────────────────────────────
+[plugins.thefuck]
+inline = 'command -v thefuck >/dev/null 2>&1 && eval "$(thefuck --alias)"'
+
+# ─── syntax-highlighting（必须放最后）────────────────────────────────────────
+[plugins.zsh-syntax-highlighting]
+github = "zsh-users/zsh-syntax-highlighting"
