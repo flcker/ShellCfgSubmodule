@@ -33,7 +33,11 @@ local plugins = {
     { "nvim-tree/nvim-web-devicons" },
     -- markdown syntax
     { "plasticboy/vim-markdown" },
-    -- 如有需要可以继续添加
+    -- LSP
+    { "williamboman/mason.nvim" },
+    { "williamboman/mason-lspconfig.nvim" },
+    { "neovim/nvim-lspconfig" },
+    { "hrsh7th/cmp-nvim-lsp" },
 }
 
 require("lazy").setup(plugins)
@@ -53,7 +57,12 @@ end)
 
 -- nvim-cmp
 pcall(function()
-    require("cmp").setup({})
+    require("cmp").setup({
+        sources = require("cmp").config.sources({
+            { name = "nvim_lsp" },
+            { name = "buffer" },
+        }),
+    })
 end)
 
 -- nvim-treesitter
