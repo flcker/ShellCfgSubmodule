@@ -65,6 +65,24 @@
         "winget": "luals.lua-language-server",
         "priority": ["brew", "apt", "winget"]
       }
+    },
+    "bashls": {
+      "command": "bash-language-server",
+      "languageIds": ["shellscript"],
+      "install": {
+        "npm": "bash-language-server",
+        "priority": ["npm"]
+      }
+    },
+    "taplo": {
+      "command": "taplo",
+      "languageIds": ["toml"],
+      "install": {
+        "cargo": "taplo-cli",
+        "brew": "taplo",
+        "winget": "tamasfe.taplo",
+        "priority": ["cargo", "brew", "winget"]
+      }
     }
   },
   "vscode_extensions": [
@@ -73,6 +91,8 @@
     "rust-lang.rust-analyzer",
     "ms-vscode.cpptools",
     "golang.go",
-    "sumneko.lua"
+    "sumneko.lua",
+    "mads-hartmann.bash-ide-vscode",
+    "tamasfe.even-better-toml"
   ]
 }

@@ -22,6 +22,8 @@
 | C / C++ | clangd | `clangd` | brew (llvm) / apt / pacman / winget |
 | Go | gopls | `gopls` | go install |
 | Lua | lua_ls | `lua-language-server` | brew / apt / winget |
+| Bash / Shell | bashls | `bash-language-server` | npm |
+| TOML | taplo | `taplo` | cargo / brew / winget |
 
 ## 快速开始
 
