@@ -11,6 +11,8 @@ require("mason-lspconfig").setup({
         "clangd",
         "gopls",
         "lua_ls",
+        "bashls",
+        "taplo",
     },
     automatic_installation = true,
 })
@@ -41,6 +43,8 @@ local servers = {
     "clangd",
     "gopls",
     "lua_ls",
+    "bashls",
+    "taplo",
 }
 
 for _, srv in ipairs(servers) do
