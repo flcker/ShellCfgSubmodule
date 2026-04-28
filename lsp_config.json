@@ -1,0 +1,78 @@
+{
+  "version": "1",
+  "servers": {
+    "tsserver": {
+      "command": "typescript-language-server",
+      "languageIds": [
+        "typescript",
+        "typescriptreact",
+        "javascript",
+        "javascriptreact"
+      ],
+      "install": {
+        "npm": "typescript typescript-language-server",
+        "priority": ["npm"]
+      }
+    },
+    "pyright": {
+      "command": "pyright-langserver",
+      "languageIds": ["python"],
+      "install": {
+        "npm": "pyright",
+        "pip": "pyright",
+        "priority": ["npm", "pip"]
+      }
+    },
+    "rust_analyzer": {
+      "command": "rust-analyzer",
+      "languageIds": ["rust"],
+      "install": {
+        "rustup": "rust-analyzer",
+        "brew": "rust-analyzer",
+        "apt": "rust-analyzer",
+        "winget": "Rust.rust-analyzer",
+        "priority": ["rustup", "brew", "apt", "winget"]
+      }
+    },
+    "clangd": {
+      "command": "clangd",
+      "languageIds": ["c", "cpp"],
+      "install": {
+        "brew": "llvm",
+        "apt": "clangd",
+        "pacman": "clang",
+        "winget": "LLVM.LLVM",
+        "priority": ["brew", "apt", "pacman", "winget"]
+      },
+      "post_install": {
+        "brew": "ln -sf \"$(brew --prefix llvm)/bin/clangd\" /opt/homebrew/bin/clangd"
+      }
+    },
+    "gopls": {
+      "command": "gopls",
+      "languageIds": ["go"],
+      "install": {
+        "go": "golang.org/x/tools/gopls@latest",
+        "priority": ["go"]
+      }
+    },
+    "lua_ls": {
+      "command": "lua-language-server",
+      "languageIds": ["lua"],
+      "install": {
+        "brew": "lua-language-server",
+        "apt": "lua-language-server",
+        "winget": "luals.lua-language-server",
+        "priority": ["brew", "apt", "winget"]
+      }
+    }
+  },
+  "vscode_extensions": [
+    "ms-vscode.vscode-typescript-next",
+    "ms-python.vscode-pylance",
+    "rust-lang.rust-analyzer",
+    "ms-vscode.cpptools",
+    "golang.go",
+    "sumneko.lua"
+  ]
+}
