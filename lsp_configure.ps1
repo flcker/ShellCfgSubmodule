@@ -23,10 +23,11 @@ function Has-Command($Name) {
 }
 
 # ── Zed ──────────────────────────────────────────────────────
+# Zed 内置所有 LSP server 的下载与管理，无需设置 binary 路径。
+# 本函数只合并 lsp_config.json 中各 server 的 "zed.initialization_options"。
 function Apply-Zed {
     $ZedSettings = "$env:APPDATA\Zed\settings.json"
     if (-not (Test-Path $ZedSettings)) {
-        # macOS/Linux 路径备用
         $ZedSettings = "$env:HOME/.config/zed/settings.json"
     }
     if (-not (Test-Path $ZedSettings)) {
@@ -37,11 +38,7 @@ function Apply-Zed {
     $Backup = $ZedSettings + ".bak"
     Copy-Item $ZedSettings $Backup
 
-    # 检测 clangd 路径
-    $ClangdPath = (Get-Command "clangd" -ErrorAction SilentlyContinue)?.Source ?? ""
-
-    # 读取并解析（去除注释和尾随逗号）
-    $Raw = Get-Content $ZedSettings -Raw
+    $Raw     = Get-Content $ZedSettings -Raw
     $Cleaned = $Raw -replace '//[^\n]*', '' -replace ',\s*([}\]])', '$1'
 
     try {
@@ -52,10 +49,27 @@ function Apply-Zed {
     }
 
     if (-not $Settings.ContainsKey("lsp")) { $Settings["lsp"] = @{} }
-    $Settings["lsp"]["clangd"] = @{ binary = @{ path = $ClangdPath } }
+
+    $Applied = @()
+    foreach ($Entry in $Config.servers.PSObject.Properties) {
+        $Name    = $Entry.Name
+        $ZedOpts = $Entry.Value.zed
+        if ($null -eq $ZedOpts) { continue }
+        $InitOpts = $ZedOpts.initialization_options
+        if ($null -eq $InitOpts) { continue }
+
+        if (-not $Settings["lsp"].ContainsKey($Name)) { $Settings["lsp"][$Name] = @{} }
+        $Settings["lsp"][$Name]["initialization_options"] = $InitOpts
+        $Applied += $Name
+    }
 
     $Settings | ConvertTo-Json -Depth 10 | Set-Content $ZedSettings
-    Write-Host "✓  Zed: clangd path set to '$ClangdPath'" -ForegroundColor Green
+
+    if ($Applied.Count -gt 0) {
+        Write-Host "✓  Zed: applied initialization_options for: $($Applied -join ', ')" -ForegroundColor Green
+    } else {
+        Write-Host "✓  Zed: no initialization_options to apply" -ForegroundColor Green
+    }
     Write-Host "   (backup: $Backup)" -ForegroundColor DarkGray
 }
 

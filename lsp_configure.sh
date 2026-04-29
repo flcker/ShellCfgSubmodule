@@ -17,6 +17,8 @@ if ! command -v python3 >/dev/null 2>&1; then
 fi
 
 # ── Zed ──────────────────────────────────────────────────────
+# Zed 内置所有 LSP server 的下载与管理，无需设置 binary 路径。
+# 本函数只合并 lsp_config.json 中各 server 的 "zed.initialization_options"。
 apply_zed() {
     local zed_settings="$HOME/.config/zed/settings.json"
     if [[ ! -f "$zed_settings" ]]; then
@@ -24,23 +26,20 @@ apply_zed() {
         return 1
     fi
 
-    ZED_SETTINGS="$zed_settings" python3 << 'PYEOF'
-import os, json, shutil
+    ZED_SETTINGS="$zed_settings" LSP_CONFIG="$LSP_CONFIG" python3 << 'PYEOF'
+import os, json, re, shutil
 
 settings_path = os.environ['ZED_SETTINGS']
+config_path   = os.environ['LSP_CONFIG']
 backup_path   = settings_path + ".bak"
 
-# 备份原始文件
 shutil.copy2(settings_path, backup_path)
 
-# Zed settings 包含 // 注释，需要预处理
 with open(settings_path) as f:
     raw = f.read()
 
-# 去除行注释（// ...）
-import re
+# Zed settings 是 JSONC，去除注释和尾随逗号后解析
 cleaned = re.sub(r'//[^\n]*', '', raw)
-# 去除尾随逗号（JSON 不允许）
 cleaned = re.sub(r',\s*([}\]])', r'\1', cleaned)
 
 try:
@@ -49,20 +48,27 @@ except json.JSONDecodeError as e:
     print(f"✗  Failed to parse {settings_path}: {e}")
     exit(1)
 
-# 检测 clangd 路径
-clangd_path = shutil.which("clangd") or ""
+with open(config_path) as f:
+    config = json.load(f)
 
 settings.setdefault("lsp", {})
-settings["lsp"]["clangd"] = {
-    "binary": { "path": clangd_path }
-}
+applied = []
 
-# 写回（保留原有注释头，追加 lsp 字段到已解析内容）
+for name, server in config.get("servers", {}).items():
+    zed_opts = server.get("zed", {})
+    init_opts = zed_opts.get("initialization_options")
+    if init_opts:
+        settings["lsp"].setdefault(name, {})["initialization_options"] = init_opts
+        applied.append(name)
+
 with open(settings_path, "w") as f:
     json.dump(settings, f, indent=2, ensure_ascii=False)
     f.write("\n")
 
-print(f"✓  Zed: clangd path set to '{clangd_path}'")
+if applied:
+    print(f"✓  Zed: applied initialization_options for: {', '.join(applied)}")
+else:
+    print("✓  Zed: no initialization_options to apply")
 print(f"   (backup: {backup_path})")
 PYEOF
 }

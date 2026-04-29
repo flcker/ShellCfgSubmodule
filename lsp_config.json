@@ -32,6 +32,11 @@
         "apt": "rust-analyzer",
         "winget": "Rust.rust-analyzer",
         "priority": ["rustup", "brew", "apt", "winget"]
+      },
+      "zed": {
+        "initialization_options": {
+          "checkOnSave": { "command": "clippy" }
+        }
       }
     },
     "clangd": {
