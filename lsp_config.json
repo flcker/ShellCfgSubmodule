@@ -34,6 +34,7 @@
         "priority": ["rustup", "brew", "apt", "winget"]
       },
       "zed": {
+        "name": "rust-analyzer",
         "initialization_options": {
           "checkOnSave": { "command": "clippy" }
         }

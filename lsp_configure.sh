@@ -58,8 +58,9 @@ for name, server in config.get("servers", {}).items():
     zed_opts = server.get("zed", {})
     init_opts = zed_opts.get("initialization_options")
     if init_opts:
-        settings["lsp"].setdefault(name, {})["initialization_options"] = init_opts
-        applied.append(name)
+        zed_name = zed_opts.get("name", name)  # Zed 可能用不同命名（如连字符）
+        settings["lsp"].setdefault(zed_name, {})["initialization_options"] = init_opts
+        applied.append(zed_name)
 
 with open(settings_path, "w") as f:
     json.dump(settings, f, indent=2, ensure_ascii=False)

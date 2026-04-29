@@ -58,9 +58,11 @@ function Apply-Zed {
         $InitOpts = $ZedOpts.initialization_options
         if ($null -eq $InitOpts) { continue }
 
-        if (-not $Settings["lsp"].ContainsKey($Name)) { $Settings["lsp"][$Name] = @{} }
-        $Settings["lsp"][$Name]["initialization_options"] = $InitOpts
-        $Applied += $Name
+        # Zed 可能用不同命名（如连字符），优先取 zed.name
+        $ZedName = if ($ZedOpts.PSObject.Properties["name"]) { $ZedOpts.name } else { $Name }
+        if (-not $Settings["lsp"].ContainsKey($ZedName)) { $Settings["lsp"][$ZedName] = @{} }
+        $Settings["lsp"][$ZedName]["initialization_options"] = $InitOpts
+        $Applied += $ZedName
     }
 
     $Settings | ConvertTo-Json -Depth 10 | Set-Content $ZedSettings
