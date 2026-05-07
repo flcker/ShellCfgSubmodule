@@ -115,6 +115,40 @@ format = "[ $path ]($style)"
 
 生成器会自动检查 palette 与 layout 的兼容性（palette 的 keys 必须覆盖 layout 要求的 `palette_keys`）。不兼容的组合会被跳过。
 
+## 添加为 submodule
+
+### 已有远程分支（克隆到新机器时）
+
+```bash
+git submodule add -b starshipauto git@github.com:flcker/ShellCfgSubmodule.git submodule/starshipauto
+git config -f .gitmodules submodule.submodule/starshipauto.shallow true
+git config -f .gitmodules submodule.submodule/starshipauto.update rebase
+git add .gitmodules submodule/starshipauto
+git commit -m "feat: add starshipauto submodule"
+```
+
+### 首次创建（新仓库初始化）
+
+```bash
+# 在 submodule/starshipauto 目录中初始化
+cd submodule/starshipauto
+git init
+git checkout -b starshipauto
+git add .
+git commit -m "feat: initial starshipauto module"
+git remote add origin git@github.com:flcker/ShellCfgSubmodule.git
+git push -u origin starshipauto
+
+# 回到父仓库，删除后重新挂载为 submodule
+cd ../..
+rm -rf submodule/starshipauto
+git submodule add -b starshipauto git@github.com:flcker/ShellCfgSubmodule.git submodule/starshipauto
+git config -f .gitmodules submodule.submodule/starshipauto.shallow true
+git config -f .gitmodules submodule.submodule/starshipauto.update rebase
+git add .gitmodules submodule/starshipauto
+git commit -m "feat: add starshipauto submodule"
+```
+
 ## 要求
 
 - Python 3.11+（使用内置 `tomllib`）
