@@ -1,0 +1,30 @@
+[metadata]
+name = "p10k-lean"
+description = "Powerlevel10k lean style - no backgrounds, no separators, pure foreground colors"
+palette_keys = ["blue", "green", "yellow", "red", "muted", "sys_lang", "web_lang", "jvm_lang", "script_lang", "func_lang", "env_color"]
+default_fg_role = ""
+
+[options]
+add_newline = true
+command_timeout = 10000
+scan_timeout = 1000
+fill_symbol = "─"
+
+[format]
+template = '''
+$hostname\
+$directory\
+$git_branch\
+$git_status\
+$git_state\
+$fill\
+{LANG_MODULES}\
+$docker_context\
+$nix_shell\
+$conda\
+$jobs\
+$status\
+$cmd_duration\
+$time\
+$line_break\
+$character'''

@@ -1,0 +1,283 @@
+[lang_order]
+order = ["c", "cpp", "cmake", "rust", "golang", "zig", "nodejs", "bun", "deno", "php", "java", "kotlin", "gradle", "scala", "python", "ruby", "lua", "perl", "haskell", "haxe", "swift", "dart", "elixir", "elm", "julia", "ocaml", "nim", "crystal", "rlang", "fennel"]
+
+# ── OS (disabled in lean) ─────────────────────────────────────────────────────
+[modules.os]
+disabled = true
+
+[modules.username]
+disabled = true
+
+# ── Hostname (SSH only) ───────────────────────────────────────────────────────
+[modules.hostname]
+ssh_only = true
+style = "bold fg:yellow"
+format = '[$ssh_symbol$hostname ]($style)'
+ssh_symbol = "󰣀 "
+
+# ── Directory ─────────────────────────────────────────────────────────────────
+[modules.directory]
+style = "bold fg:blue"
+format = "[$path ]($style)"
+truncation_length = 4
+truncation_symbol = "…/"
+fish_style_pwd_dir_length = 1
+read_only = " 󰌾"
+read_only_style = "fg:red"
+
+[modules.directory_substitutions]
+"~" = " "
+"Desktop" = " "
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = "󰝚 "
+"Musics" = "󰝚 "
+"Video" = " "
+"Videos" = " "
+"Pictures" = " "
+"Developer" = "󰲋 "
+"Workspace" = "󰕮 "
+
+# ── Git ───────────────────────────────────────────────────────────────────────
+[modules.git_branch]
+symbol = " "
+style = "fg:green"
+format = '[$symbol$branch ]($style)'
+
+[modules.git_status]
+style = "fg:yellow"
+format = '([$all_status$ahead_behind]($style))'
+conflicted = "⚔ "
+untracked = "? "
+stashed = "≡ "
+modified = "! "
+staged = "+ "
+renamed = "» "
+deleted = "✘ "
+ahead = "⇡${count} "
+behind = "⇣${count} "
+diverged = "⇕ "
+up_to_date = ""
+
+[modules.git_state]
+style = "fg:red"
+format = '\([$state( $progress_current/$progress_total)]($style)\) '
+
+[modules.git_commit]
+tag_symbol = '  '
+
+# ── Languages: System ─────────────────────────────────────────────────────────
+[modules.c]
+symbol = " "
+style = "fg:sys_lang"
+format = '[$symbol($version) ]($style)'
+
+[modules.cpp]
+symbol = " "
+style = "fg:sys_lang"
+format = '[$symbol($version) ]($style)'
+
+[modules.cmake]
+symbol = " "
+style = "fg:sys_lang"
+format = '[$symbol($version) ]($style)'
+
+[modules.rust]
+symbol = "󱘗 "
+style = "fg:sys_lang"
+format = '[$symbol($version) ]($style)'
+
+[modules.golang]
+symbol = " "
+style = "fg:sys_lang"
+format = '[$symbol($version) ]($style)'
+
+[modules.zig]
+symbol = " "
+style = "fg:sys_lang"
+format = '[$symbol($version) ]($style)'
+
+# ── Languages: Web ────────────────────────────────────────────────────────────
+[modules.nodejs]
+symbol = " "
+style = "fg:web_lang"
+format = '[$symbol($version) ]($style)'
+
+[modules.bun]
+symbol = " "
+style = "fg:web_lang"
+format = '[$symbol($version) ]($style)'
+
+[modules.deno]
+symbol = " "
+style = "fg:web_lang"
+format = '[$symbol($version) ]($style)'
+
+[modules.php]
+symbol = " "
+style = "fg:web_lang"
+format = '[$symbol($version) ]($style)'
+
+# ── Languages: JVM ────────────────────────────────────────────────────────────
+[modules.java]
+symbol = " "
+style = "fg:jvm_lang"
+format = '[$symbol($version) ]($style)'
+
+[modules.kotlin]
+symbol = " "
+style = "fg:jvm_lang"
+format = '[$symbol($version) ]($style)'
+
+[modules.gradle]
+symbol = " "
+style = "fg:jvm_lang"
+format = '[$symbol($version) ]($style)'
+
+[modules.scala]
+symbol = " "
+style = "fg:jvm_lang"
+format = '[$symbol($version) ]($style)'
+
+# ── Languages: Scripting ──────────────────────────────────────────────────────
+[modules.python]
+symbol = " "
+style = "fg:script_lang"
+format = '[$symbol($version)(\($virtualenv\)) ]($style)'
+
+[modules.ruby]
+symbol = " "
+style = "fg:script_lang"
+format = '[$symbol($version) ]($style)'
+
+[modules.lua]
+symbol = " "
+style = "fg:script_lang"
+format = '[$symbol($version) ]($style)'
+
+[modules.perl]
+symbol = " "
+style = "fg:script_lang"
+format = '[$symbol($version) ]($style)'
+
+# ── Languages: Functional/Niche ──────────────────────────────────────────────
+[modules.haskell]
+symbol = " "
+style = "fg:func_lang"
+format = '[$symbol($version) ]($style)'
+
+[modules.haxe]
+symbol = " "
+style = "fg:func_lang"
+format = '[$symbol($version) ]($style)'
+
+[modules.swift]
+symbol = " "
+style = "fg:func_lang"
+format = '[$symbol($version) ]($style)'
+
+[modules.dart]
+symbol = " "
+style = "fg:func_lang"
+format = '[$symbol($version) ]($style)'
+
+[modules.elixir]
+symbol = " "
+style = "fg:func_lang"
+format = '[$symbol($version) ]($style)'
+
+[modules.elm]
+symbol = " "
+style = "fg:func_lang"
+format = '[$symbol($version) ]($style)'
+
+[modules.julia]
+symbol = " "
+style = "fg:func_lang"
+format = '[$symbol($version) ]($style)'
+
+[modules.ocaml]
+symbol = " "
+style = "fg:func_lang"
+format = '[$symbol($version) ]($style)'
+
+[modules.nim]
+symbol = "󰆥 "
+style = "fg:func_lang"
+format = '[$symbol($version) ]($style)'
+
+[modules.crystal]
+symbol = " "
+style = "fg:func_lang"
+format = '[$symbol($version) ]($style)'
+
+[modules.rlang]
+symbol = "󰟔 "
+style = "fg:func_lang"
+format = '[$symbol($version) ]($style)'
+
+[modules.fennel]
+symbol = " "
+style = "fg:func_lang"
+format = '[$symbol($version) ]($style)'
+
+# ── Containers / Environments ─────────────────────────────────────────────────
+[modules.docker_context]
+symbol = " "
+style = "fg:env_color"
+format = '[$symbol($context) ]($style)'
+
+[modules.nix_shell]
+symbol = " "
+style = "fg:env_color"
+format = '[$symbol$state( \($name\)) ]($style)'
+
+[modules.conda]
+symbol = "  "
+style = "fg:env_color"
+format = '[$symbol$environment ]($style)'
+ignore_base = false
+
+# ── Fill ──────────────────────────────────────────────────────────────────────
+[modules.fill]
+symbol = "─"
+style = "fg:muted"
+
+# ── Jobs ──────────────────────────────────────────────────────────────────────
+[modules.jobs]
+disabled = false
+symbol = "✦"
+style = "bold fg:blue"
+number_threshold = 1
+format = "[$symbol$number ]($style)"
+
+# ── Status ────────────────────────────────────────────────────────────────────
+[modules.status]
+disabled = false
+style = "bold fg:red"
+symbol = "✘"
+success_symbol = ""
+not_executable_symbol = ""
+not_found_symbol = ""
+format = '[$symbol $status ]($style)'
+
+# ── Command Duration ──────────────────────────────────────────────────────────
+[modules.cmd_duration]
+min_time = 10
+show_milliseconds = true
+show_notifications = true
+min_time_to_notify = 5000
+style = "fg:yellow"
+format = "[󱎫 $duration ]($style)"
+disabled = false
+
+# ── Time ──────────────────────────────────────────────────────────────────────
+[modules.time]
+disabled = false
+time_format = "%R"
+style = "fg:muted"
+format = '[ $time ]($style)'
+
+# ── Line Break ────────────────────────────────────────────────────────────────
+[modules.line_break]
+disabled = false

@@ -1,0 +1,13 @@
+[palette]
+os_bg = "#d0d0d0"
+dark = "#1c1c1c"
+white = "#ffffff"
+blue = "#005fd7"
+green = "#00af00"
+yellow = "#d7af00"
+red = "#d70000"
+grey = "#4e4e4e"
+teal = "#005f87"
+
+[hints]
+fg_role = "dark"
