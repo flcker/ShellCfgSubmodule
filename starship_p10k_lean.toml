@@ -1,0 +1,396 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# ╭──────────────────────────────────────────────────────────────────────────────╮
+# │ Powerlevel10k Lean Style for Starship                                        │
+# │ 极简设计：无背景色、无 powerline 箭头、纯前景色文字                          │
+# ╰──────────────────────────────────────────────────────────────────────────────╯
+#
+# ── 可配置项速查 ──────────────────────────────────────────────────────────────
+#
+# 【提示符形状】Lean 无 powerline 箭头，无需配置 HEAD/SEP/TAIL
+#   如需在左右之间添加视觉分隔，修改 [fill] symbol
+#
+# 【连接线】[fill] symbol:
+#   "─" "·" "." "━" "╌" "┄" " "(空格=无连接线)
+#
+# 【提示符号】[character]:
+#   ❯ ❮ ➜ ▶  λ ∮ ➤
+#
+# 【换行】add_newline:
+#   true = 每次提示前插入空行(间隔行)  false = 紧凑无间隔
+#
+# 【双行/单行】$line_break:
+#   保留 = 双行提示(Line1: info, Line2: ❯)
+#   删除 $line_break 和 $character = 单行提示(info 后直接输入)
+#
+# 【替代方案: right_format】
+#   如不需要连接线，可注释掉 format 中 $fill 及其后的右侧内容，
+#   取消注释下方 right_format:
+# right_format = """$c$cpp$cmake$rust$golang$nodejs$bun$deno$php$java$kotlin$gradle$haskell$haxe$python$ruby$lua$swift$zig$scala$dart$elixir$elm$julia$perl$ocaml$nim$crystal$rlang$fennel$docker_context$nix_shell$conda$jobs$status$cmd_duration$time"""
+#
+# ──────────────────────────────────────────────────────────────────────────────
+
+command_timeout = 10000
+scan_timeout = 1000
+add_newline = true             # 间隔行: true=提示前插入空行 false=紧凑
+
+# ── Format ────────────────────────────────────────────────────────────────────
+# 结构: [dir][git_branch][git_status][git_state]
+#       $fill
+#       [languages][containers][jobs][status][duration][time]
+#       $line_break
+#       $character
+
+format = """
+$hostname\
+$directory\
+$git_branch\
+$git_status\
+$git_state\
+$fill\
+$c\
+$cpp\
+$cmake\
+$rust\
+$golang\
+$nodejs\
+$bun\
+$deno\
+$php\
+$java\
+$kotlin\
+$gradle\
+$haskell\
+$haxe\
+$python\
+$ruby\
+$lua\
+$swift\
+$zig\
+$scala\
+$dart\
+$elixir\
+$elm\
+$julia\
+$perl\
+$ocaml\
+$nim\
+$crystal\
+$rlang\
+$fennel\
+$docker_context\
+$nix_shell\
+$conda\
+$jobs\
+$status\
+$cmd_duration\
+$time\
+$line_break\
+$character"""
+
+palette = 'p10k_lean'
+
+# ── OS (disabled in lean) ─────────────────────────────────────────────────────
+[os]
+disabled = true
+
+# ── Username (disabled in lean) ───────────────────────────────────────────────
+[username]
+disabled = true
+
+# ── Hostname (SSH only) ───────────────────────────────────────────────────────
+[hostname]
+ssh_only = true
+style = "bold fg:yellow"
+format = '[$ssh_symbol$hostname ]($style)'
+ssh_symbol = "󰣀 "             # 可选: 󰣀  🔒
+
+# ── Directory ─────────────────────────────────────────────────────────────────
+[directory]
+style = "bold fg:blue"
+format = "[$path ]($style)"
+truncation_length = 4
+truncation_symbol = "…/"
+fish_style_pwd_dir_length = 1
+read_only = " 󰌾"
+read_only_style = "fg:red"
+
+[directory.substitutions]
+"~" = " "
+"Desktop" = " "
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = "󰝚 "
+"Musics" = "󰝚 "
+"Video" = " "
+"Videos" = " "
+"Pictures" = " "
+"Developer" = "󰲋 "
+"Workspace" = "󰕮 "
+
+# ── Git ───────────────────────────────────────────────────────────────────────
+[git_branch]
+symbol = " "                   # 可选:
+style = "fg:green"
+format = '[$symbol$branch ]($style)'
+
+[git_status]
+style = "fg:yellow"
+conflicted = "⚔ "
+untracked = "? "
+stashed = "≡ "
+modified = "! "
+staged = "+ "
+renamed = "» "
+deleted = "✘ "
+ahead = "⇡${count} "
+behind = "⇣${count} "
+diverged = "⇕ "
+up_to_date = ""
+format = '([$all_status$ahead_behind]($style))'
+
+[git_state]
+style = "fg:red"
+format = '\([$state( $progress_current/$progress_total)]($style)\) '
+
+[git_commit]
+tag_symbol = '  '
+
+# ── Languages: System (C/C++/Rust/Go/Zig) ────────────────────────────────────
+[c]
+symbol = " "
+style = "fg:sys_lang"
+format = '[$symbol($version) ]($style)'
+
+[cpp]
+symbol = " "
+style = "fg:sys_lang"
+format = '[$symbol($version) ]($style)'
+
+[cmake]
+symbol = " "
+style = "fg:sys_lang"
+format = '[$symbol($version) ]($style)'
+
+[rust]
+symbol = "󱘗 "
+style = "fg:sys_lang"
+format = '[$symbol($version) ]($style)'
+
+[golang]
+symbol = " "
+style = "fg:sys_lang"
+format = '[$symbol($version) ]($style)'
+
+[zig]
+symbol = " "
+style = "fg:sys_lang"
+format = '[$symbol($version) ]($style)'
+
+# ── Languages: Web (Node/Bun/Deno/PHP) ───────────────────────────────────────
+[nodejs]
+symbol = " "
+style = "fg:web_lang"
+format = '[$symbol($version) ]($style)'
+
+[bun]
+symbol = " "
+style = "fg:web_lang"
+format = '[$symbol($version) ]($style)'
+
+[deno]
+symbol = " "
+style = "fg:web_lang"
+format = '[$symbol($version) ]($style)'
+
+[php]
+symbol = " "
+style = "fg:web_lang"
+format = '[$symbol($version) ]($style)'
+
+# ── Languages: JVM (Java/Kotlin/Gradle/Scala) ────────────────────────────────
+[java]
+symbol = " "
+style = "fg:jvm_lang"
+format = '[$symbol($version) ]($style)'
+
+[kotlin]
+symbol = " "
+style = "fg:jvm_lang"
+format = '[$symbol($version) ]($style)'
+
+[gradle]
+symbol = " "
+style = "fg:jvm_lang"
+format = '[$symbol($version) ]($style)'
+
+[scala]
+symbol = " "
+style = "fg:jvm_lang"
+format = '[$symbol($version) ]($style)'
+
+# ── Languages: Scripting (Python/Ruby/Lua/Perl) ──────────────────────────────
+[python]
+symbol = " "
+style = "fg:script_lang"
+format = '[$symbol($version)(\($virtualenv\)) ]($style)'
+
+[ruby]
+symbol = " "
+style = "fg:script_lang"
+format = '[$symbol($version) ]($style)'
+
+[lua]
+symbol = " "
+style = "fg:script_lang"
+format = '[$symbol($version) ]($style)'
+
+[perl]
+symbol = " "
+style = "fg:script_lang"
+format = '[$symbol($version) ]($style)'
+
+# ── Languages: Functional/Niche ──────────────────────────────────────────────
+[haskell]
+symbol = " "
+style = "fg:func_lang"
+format = '[$symbol($version) ]($style)'
+
+[haxe]
+symbol = " "
+style = "fg:func_lang"
+format = '[$symbol($version) ]($style)'
+
+[swift]
+symbol = " "
+style = "fg:func_lang"
+format = '[$symbol($version) ]($style)'
+
+[dart]
+symbol = " "
+style = "fg:func_lang"
+format = '[$symbol($version) ]($style)'
+
+[elixir]
+symbol = " "
+style = "fg:func_lang"
+format = '[$symbol($version) ]($style)'
+
+[elm]
+symbol = " "
+style = "fg:func_lang"
+format = '[$symbol($version) ]($style)'
+
+[julia]
+symbol = " "
+style = "fg:func_lang"
+format = '[$symbol($version) ]($style)'
+
+[ocaml]
+symbol = " "
+style = "fg:func_lang"
+format = '[$symbol($version) ]($style)'
+
+[nim]
+symbol = "󰆥 "
+style = "fg:func_lang"
+format = '[$symbol($version) ]($style)'
+
+[crystal]
+symbol = " "
+style = "fg:func_lang"
+format = '[$symbol($version) ]($style)'
+
+[rlang]
+symbol = "󰟔 "
+style = "fg:func_lang"
+format = '[$symbol($version) ]($style)'
+
+[fennel]
+symbol = " "
+style = "fg:func_lang"
+format = '[$symbol($version) ]($style)'
+
+# ── Containers / Environments ─────────────────────────────────────────────────
+[docker_context]
+symbol = " "
+style = "fg:env_color"
+format = '[$symbol($context) ]($style)'
+
+[nix_shell]
+symbol = " "
+style = "fg:env_color"
+format = '[$symbol$state( \($name\)) ]($style)'
+
+[conda]
+symbol = "  "
+style = "fg:env_color"
+format = '[$symbol$environment ]($style)'
+ignore_base = false
+
+# ── Fill (连接线) ─────────────────────────────────────────────────────────────
+[fill]
+symbol = "─"    # 可选: "·" "." "━" "╌" "┄" " "(空格=无连接线)
+style = "fg:muted"
+
+# ── Jobs ──────────────────────────────────────────────────────────────────────
+[jobs]
+disabled = false
+symbol = "✦"                   # 可选: ✦ ⚙
+style = "bold fg:blue"
+number_threshold = 1
+format = "[$symbol$number ]($style)"
+
+# ── Status ────────────────────────────────────────────────────────────────────
+[status]
+disabled = false
+style = "bold fg:red"
+symbol = "✘"                   # 可选: ✘ ✗ ✖  ×
+success_symbol = ""
+not_executable_symbol = ""
+not_found_symbol = ""
+format = '[$symbol $status ]($style)'
+
+# ── Command Duration ──────────────────────────────────────────────────────────
+[cmd_duration]
+min_time = 10
+show_milliseconds = true
+show_notifications = true
+min_time_to_notify = 5000
+style = "fg:yellow"
+format = "[󱎫 $duration ]($style)"
+disabled = false
+
+# ── Time ──────────────────────────────────────────────────────────────────────
+[time]
+disabled = false
+time_format = "%R"             # %R=HH:MM  %T=HH:MM:SS  %r=12h
+style = "fg:muted"
+format = '[ $time ]($style)'
+
+# ── Line Break & Character ────────────────────────────────────────────────────
+[line_break]
+disabled = false               # false=双行提示  true=单行(info后直接输入)
+
+[character]
+disabled = false
+success_symbol = '[❯](bold fg:green)'    # 可选: ❯ ➜ ▶  λ ∮ ➤
+error_symbol = '[❯](bold fg:red)'
+vimcmd_symbol = '[❮](bold fg:green)'
+vimcmd_replace_one_symbol = '[❮](bold fg:yellow)'
+vimcmd_replace_symbol = '[❮](bold fg:yellow)'
+vimcmd_visual_symbol = '[❮](bold fg:yellow)'
+
+# ── Palette ───────────────────────────────────────────────────────────────────
+[palettes.p10k_lean]
+blue = "#005fd7"
+green = "#00af00"
+yellow = "#d7af00"
+red = "#d70000"
+muted = "#808080"
+sys_lang = "#5f87d7"
+web_lang = "#87af00"
+jvm_lang = "#d78700"
+script_lang = "#af5faf"
+func_lang = "#00afaf"
+env_color = "#5f5faf"

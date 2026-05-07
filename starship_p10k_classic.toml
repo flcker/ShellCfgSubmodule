@@ -1,0 +1,491 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# ╭──────────────────────────────────────────────────────────────────────────────╮
+# │ Powerlevel10k Classic Style for Starship                                     │
+# │ 与 Rainbow 相同布局，使用更低调暗沉的配色                                    │
+# ╰──────────────────────────────────────────────────────────────────────────────╯
+#
+# ── 可配置项速查 ──────────────────────────────────────────────────────────────
+#
+# 【提示符形状】
+#   Starship 不支持文本变量（palette 仅用于颜色），形状字符需在 format 中直接替换。
+#   当前使用: 圆角头尾 + 箭头分隔
+#
+#   切换方法 — 在 format 中查找替换对应位置的字符:
+#   ┌──────────────┬──────────────────┬──────────────────┬──────────────────┐
+#   │ 位置         │ 箭头             │ 圆角             │ 斜线             │
+#   ├──────────────┼──────────────────┼──────────────────┼──────────────────┤
+#   │ LEFT_HEAD    │ [](fg:X)      │ [](fg:X)      │ (删除该行)       │
+#   │ LEFT_SEP     │ [](bg:X fg:Y) │ (同左/圆角无bg)  │ (同左)           │
+#   │ LEFT_TAIL    │ [](fg:X)      │ [](fg:X)      │ [](fg:X)      │
+#   │ RIGHT_HEAD   │ [](fg:X)      │ [](fg:X)      │ [](fg:X)      │
+#   │ RIGHT_TAIL   │ [](fg:X)      │ [](fg:X)      │ (删除该行)       │
+#   └──────────────┴──────────────────┴──────────────────┴──────────────────┘
+#
+# 【连接线】[fill] symbol:
+#   "─" "·" "." "━" "╌" "┄" " "(空格=无连接线)
+#
+# 【提示符号】[character]:
+#   ❯ ❮ ➜ ▶  λ ∮ ➤
+#
+# 【换行】add_newline:
+#   true = 每次提示前插入空行(间隔行)  false = 紧凑无间隔
+#
+# 【双行/单行】$line_break:
+#   保留 = 双行提示(Line1: segments, Line2: ❯)
+#   删除 $line_break 和 $character = 单行提示(segments 后直接输入)
+#
+# 【替代方案: right_format】
+#   如不需要连接线，注释掉 format 中 $fill 及其后的右侧内容，
+#   取消注释:
+# right_format = """"$jobs$status$cmd_duration[](fg:os_bg)[  $	ime ](fg:white bg:os_bg)[](fg:os_bg)""""
+#
+# ──────────────────────────────────────────────────────────────────────────────
+
+command_timeout = 10000
+scan_timeout = 1000
+add_newline = true             # 间隔行: true=提示前插入空行 false=紧凑
+
+# ── Format ────────────────────────────────────────────────────────────────────
+# 当前: 圆角HEAD() + 箭头SEP() + 箭头TAIL() + 箭头RHEAD() + 圆角RTAIL()
+
+format = """
+[](fg:os_bg)\
+$os\
+$username\
+$hostname\
+[](bg:blue fg:os_bg)\
+$directory\
+[](bg:green fg:blue)\
+$git_branch\
+$git_status\
+[](fg:green bg:grey)\
+$c\
+$cpp\
+$cmake\
+$rust\
+$golang\
+$nodejs\
+$bun\
+$deno\
+$php\
+$java\
+$kotlin\
+$gradle\
+$haskell\
+$haxe\
+$python\
+$ruby\
+$lua\
+$swift\
+$zig\
+$scala\
+$dart\
+$elixir\
+$elm\
+$julia\
+$perl\
+$ocaml\
+$nim\
+$crystal\
+$rlang\
+$fennel\
+[](fg:grey bg:teal)\
+$docker_context\
+$nix_shell\
+$conda\
+[](fg:teal)\
+$fill\
+[](fg:grey)\
+$jobs\
+$status\
+$cmd_duration\
+[](fg:os_bg bg:grey)\
+[  $time ](fg:white bg:os_bg)\
+[](fg:os_bg)\
+$line_break\
+$character"""
+
+# ── 备选 Format (纯箭头风格) ──────────────────────────────────────────────────
+# 如需纯箭头风格，注释掉上方 format 并取消注释以下:
+# format = """
+# [](os_bg)\
+# $os\
+# $username\
+# $hostname\
+# [](bg:blue fg:os_bg)\
+# $directory\
+# [](bg:green fg:blue)\
+# $git_branch\
+# $git_status\
+# [](fg:green bg:grey)\
+# $c\
+# $cpp\...( 省略语言模块，与上方相同 )...
+# [](fg:grey bg:teal)\
+# $docker_context\
+# $nix_shell\
+# $conda\
+# [](fg:teal)\
+# $fill\
+# $jobs\
+# $status\
+# $cmd_duration\
+# [](fg:os_bg)\
+# [  $time ](fg:white bg:os_bg)\
+# [](fg:os_bg)\
+# $line_break\
+# $character"""
+
+palette = 'p10k_classic'
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+[os]
+disabled = false
+style = "bg:os_bg fg:white"
+format = "[ $symbol]($style)"
+
+[os.symbols]
+Alpaquita = " "
+Alpine = " "
+AlmaLinux = " "
+Amazon = " "
+Android = " "
+AOSC = " "
+Arch = " "
+Artix = " "
+CachyOS = " "
+CentOS = " "
+Debian = " "
+DragonFly = " "
+Elementary = " "
+Emscripten = " "
+EndeavourOS = " "
+Fedora = " "
+FreeBSD = " "
+Garuda = "󰛓 "
+Gentoo = " "
+HardenedBSD = "󰞌 "
+Illumos = "󰈸 "
+Ios = "󰀷 "
+Kali = " "
+Linux = " "
+Mabox = " "
+Macos = " "
+Manjaro = " "
+Mariner = " "
+MidnightBSD = " "
+Mint = " "
+NetBSD = " "
+NixOS = " "
+Nobara = " "
+OpenBSD = "󰈺 "
+openSUSE = " "
+OracleLinux = "󰌷 "
+Pop = " "
+Raspbian = " "
+Redhat = " "
+RedHatEnterprise = " "
+RockyLinux = " "
+Redox = "󰀘 "
+Solus = "󰠳 "
+SUSE = " "
+Ubuntu = " "
+Unknown = " "
+Void = " "
+Windows = "󰍲 "
+Zorin = " "
+InstantOS = "󰔚 "
+# ── Username ──────────────────────────────────────────────────────────────────
+[username]
+show_always = true
+style_user = "bg:os_bg fg:white"
+style_root = "bg:os_bg fg:red"
+format = '[ $user ]($style)'
+
+# ── Hostname (SSH only) ───────────────────────────────────────────────────────
+[hostname]
+ssh_only = true
+style = "bg:os_bg fg:white"
+format = '[@$hostname ]($style)'
+
+# ── Directory ─────────────────────────────────────────────────────────────────
+[directory]
+style = "bg:blue fg:white"
+format = "[ $path ]($style)"
+truncation_length = 4
+truncation_symbol = "…/"
+fish_style_pwd_dir_length = 1
+read_only = " 󰌾"
+read_only_style = "bg:blue fg:white"
+
+[directory.substitutions]
+"~" = " "
+"Desktop" = " "
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = "󰝚 "
+"Musics" = "󰝚 "
+"Video" = " "
+"Videos" = " "
+"Pictures" = " "
+"Developer" = "󰲋 "
+"Workspace" = "󰕮 "
+
+# ── Git ───────────────────────────────────────────────────────────────────────
+[git_branch]
+symbol = " "                   #  可选:
+style = "bg:green fg:white"
+format = '[[ $symbol$branch ](fg:white bg:green)]($style)'
+
+[git_status]
+style = "bg:green"
+conflicted = "[⚔${count}](fg:red bg:green)"
+untracked = "[?${count}](fg:yellow bg:green)"
+stashed = "[≡${count}](fg:white bg:green)"
+modified = "[!${count}](fg:yellow bg:green)"
+staged = "[+${count}](fg:white bg:green)"
+renamed = "[»${count}](fg:yellow bg:green)"
+deleted = "[✘${count}](fg:red bg:green)"
+ahead = "[⇡${count}](fg:white bg:green)"
+behind = "[⇣${count}](fg:white bg:green)"
+diverged = "[⇕⇡${ahead_count}⇣${behind_count}](fg:yellow bg:green)"
+up_to_date = ""
+format = '([[$all_status$ahead_behind ](bg:green)]($style))'
+
+[git_commit]
+tag_symbol = '  '
+
+# ── Languages ─────────────────────────────────────────────────────────────────
+# icon 可在各模块 symbol 字段替换
+[c]
+symbol = " "
+style = "bg:grey"
+format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+
+[cpp]
+symbol = " "
+style = "bg:grey"
+format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+
+[cmake]
+symbol = " "
+style = "bg:grey"
+format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+
+[rust]
+symbol = "󱘗 "
+style = "bg:grey"
+format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+
+[golang]
+symbol = " "
+style = "bg:grey"
+format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+
+[nodejs]
+symbol = " "
+style = "bg:grey"
+format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+
+[bun]
+symbol = " "
+style = "bg:grey"
+format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+
+[deno]
+symbol = " "
+style = "bg:grey"
+format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+
+[php]
+symbol = " "
+style = "bg:grey"
+format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+
+[java]
+symbol = " "
+style = "bg:grey"
+format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+
+[kotlin]
+symbol = " "
+style = "bg:grey"
+format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+
+[gradle]
+symbol = " "
+style = "bg:grey"
+format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+
+[haskell]
+symbol = " "
+style = "bg:grey"
+format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+
+[haxe]
+symbol = " "
+style = "bg:grey"
+format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+
+[python]
+symbol = " "
+style = "bg:grey"
+format = '[[ $symbol($version)(\($virtualenv\)) ](fg:white bg:grey)]($style)'
+
+[ruby]
+symbol = " "
+style = "bg:grey"
+format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+
+[lua]
+symbol = " "
+style = "bg:grey"
+format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+
+[swift]
+symbol = " "
+style = "bg:grey"
+format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+
+[zig]
+symbol = " "
+style = "bg:grey"
+format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+
+[scala]
+symbol = " "
+style = "bg:grey"
+format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+
+[dart]
+symbol = " "
+style = "bg:grey"
+format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+
+[elixir]
+symbol = " "
+style = "bg:grey"
+format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+
+[elm]
+symbol = " "
+style = "bg:grey"
+format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+
+[julia]
+symbol = " "
+style = "bg:grey"
+format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+
+[perl]
+symbol = " "
+style = "bg:grey"
+format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+
+[ocaml]
+symbol = " "
+style = "bg:grey"
+format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+
+[nim]
+symbol = "󰆥 "
+style = "bg:grey"
+format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+
+[crystal]
+symbol = " "
+style = "bg:grey"
+format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+
+[rlang]
+symbol = "󰟔 "
+style = "bg:grey"
+format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+
+[fennel]
+symbol = " "
+style = "bg:grey"
+format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+
+# ── Containers / Environments ─────────────────────────────────────────────────
+[docker_context]
+symbol = " "
+style = "bg:teal"
+format = '[[ $symbol($context) ](fg:white bg:teal)]($style)'
+
+[nix_shell]
+symbol = " "
+style = "bg:teal"
+format = '[[ $symbol$state( \($name\)) ](fg:white bg:teal)]($style)'
+
+[conda]
+symbol = "  "
+style = "fg:white bg:teal"
+format = '[$symbol$environment ]($style)'
+ignore_base = false
+
+# ── Fill (连接线) ─────────────────────────────────────────────────────────────
+[fill]
+symbol = "─"    # 可选: "·" "." "━" "╌" "┄" " "(空格=无连接线)
+style = "fg:grey"
+
+# ── Jobs ──────────────────────────────────────────────────────────────────────
+[jobs]
+disabled = false
+symbol = "✦"                   # 可选: ✦ ⚙
+style = "bold fg:yellow bg:grey"
+number_threshold = 1
+format = "[ $symbol$number ]($style)"
+
+# ── Status ────────────────────────────────────────────────────────────────────
+[status]
+disabled = false
+style = "bold fg:red bg:grey"
+symbol = "✘"                   # 可选: ✘ ✗ ✖  ×
+success_symbol = ""
+not_executable_symbol = ""
+not_found_symbol = ""
+format = '[ $symbol $status ]($style)'
+
+# ── Command Duration ──────────────────────────────────────────────────────────
+[cmd_duration]
+min_time = 10
+show_milliseconds = true
+show_notifications = true
+min_time_to_notify = 5000
+style = "fg:yellow bg:grey"
+format = "[ 󱎫 $duration ]($style)"
+disabled = false
+
+# ── Time ──────────────────────────────────────────────────────────────────────
+[time]
+disabled = false
+time_format = "%R"             # %R=HH:MM  %T=HH:MM:SS  %r=12h
+style = "fg:white bg:os_bg"
+format = '  $time '
+
+# ── Line Break & Character ────────────────────────────────────────────────────
+[line_break]
+disabled = false               # false=双行提示  true=单行(segment后直接输入)
+
+[character]
+disabled = false
+success_symbol = '[❯](bold fg:green)'    # 可选: ❯ ➜ ▶  λ ∮ ➤
+error_symbol = '[❯](bold fg:red)'
+vimcmd_symbol = '[❮](bold fg:green)'
+vimcmd_replace_one_symbol = '[❮](bold fg:yellow)'
+vimcmd_replace_symbol = '[❮](bold fg:yellow)'
+vimcmd_visual_symbol = '[❮](bold fg:yellow)'
+
+# ── Palette ───────────────────────────────────────────────────────────────────
+# Classic 与 Rainbow 仅 palette 色值不同（含 format 中 fg:dark/fg:white 的对应差异）
+[palettes.p10k_classic]
+os_bg = "#303030"
+dark = "#1c1c1c"
+white = "#d4d4d4"
+blue = "#3a7ecf"
+green = "#2e7d32"
+yellow = "#c49000"
+red = "#c62828"
+grey = "#262626"
+teal = "#1a5276"
