@@ -1,3 +1,53 @@
+# ── Metadata ─────────────────────────────────────────────────────────────────
+# palette_keys: 调色板必须提供的颜色名
+# compatible_separators: 可搭配的分隔符风格（对应 data/separators/ 文件名）
+[metadata]
+name = "pl"
+description = "Powerline layout with background segments"
+palette_keys = ["os_bg", "dark", "white", "blue", "green", "yellow", "red", "grey", "teal"]
+default_fg_role = "dark"
+compatible_separators = ["angled_round", "round_round", "slanted_round", "angled_sharp", "slanted_none"]
+
+# ── Format Template ──────────────────────────────────────────────────────────
+# 占位符说明:
+#   {HEAD:color}         — 首段开口帽（无则省略）
+#   {SEP:prev:next}      — 左侧段间过渡 [glyph](bg:next fg:prev)
+#   {L_END:color}        — 左侧末段封口
+#   {R_START:color}      — 右侧首段开口
+#   {R_SEP:next:prev}    — 右侧段间过渡 [glyph](fg:next bg:prev)
+#   {R_TAIL:color}       — 右侧末段封口帽（无则省略）
+#   {LANG_MODULES}       — 展开为所有语言模块变量
+#   {FG_ROLE}            — 由 palette hints.fg_role 决定的前景色
+[format]
+template = '''
+{HEAD:os_bg}\
+$os\
+$username\
+$hostname\
+{SEP:os_bg:blue}\
+$directory\
+{SEP:blue:green}\
+$git_branch\
+$git_status\
+{SEP:green:grey}\
+{LANG_MODULES}\
+{SEP:grey:teal}\
+$docker_context\
+$nix_shell\
+$conda\
+{L_END:teal}\
+$fill\
+{R_START:grey}\
+$jobs\
+$status\
+$cmd_duration\
+{R_SEP:os_bg:grey}\
+[  $time ](fg:{FG_ROLE} bg:os_bg)\
+{R_TAIL:os_bg}\
+$line_break\
+$character'''
+
+# ── Language Order ───────────────────────────────────────────────────────────
 [lang_order]
 order = ["c", "cpp", "cmake", "rust", "golang", "nodejs", "bun", "deno", "php", "java", "kotlin", "gradle", "haskell", "haxe", "python", "ruby", "lua", "swift", "zig", "scala", "dart", "elixir", "elm", "julia", "perl", "ocaml", "nim", "crystal", "rlang", "fennel"]
 
@@ -242,14 +292,14 @@ style = "fg:grey"
 [modules.jobs]
 disabled = false
 symbol = "✦"
-style = "bold fg:yellow bg:grey"
+style = "bold fg:{FG_ROLE} bg:grey"
 number_threshold = 1
 format = "[ $symbol$number ]($style)"
 
 # ── Status ────────────────────────────────────────────────────────────────────
 [modules.status]
 disabled = false
-style = "bold fg:red bg:grey"
+style = "bold fg:{FG_ROLE} bg:grey"
 symbol = "✘"
 success_symbol = ""
 not_executable_symbol = ""
@@ -262,7 +312,7 @@ min_time = 10
 show_milliseconds = true
 show_notifications = true
 min_time_to_notify = 5000
-style = "fg:yellow bg:grey"
+style = "fg:{FG_ROLE} bg:grey"
 format = "[ 󱎫 $duration ]($style)"
 disabled = false
 

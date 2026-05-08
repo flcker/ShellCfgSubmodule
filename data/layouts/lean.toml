@@ -1,3 +1,36 @@
+# ── Metadata ─────────────────────────────────────────────────────────────────
+# palette_keys: 调色板必须提供的颜色名（lean 使用语言分组色而非背景色）
+# compatible_separators: 仅 "none"（lean 无分隔符）
+[metadata]
+name = "lean"
+description = "Lean style, no separators, no head/tail"
+palette_keys = ["blue", "green", "yellow", "red", "muted", "sys_lang", "web_lang", "jvm_lang", "script_lang", "func_lang", "env_color"]
+default_fg_role = ""
+compatible_separators = ["none"]
+
+# ── Format Template ──────────────────────────────────────────────────────────
+# 无分隔符占位符，模块直接拼接
+# {LANG_MODULES} — 展开为所有语言模块变量
+[format]
+template = '''
+$hostname\
+$directory\
+$git_branch\
+$git_status\
+$git_state\
+$fill\
+{LANG_MODULES}\
+$docker_context\
+$nix_shell\
+$conda\
+$jobs\
+$status\
+$cmd_duration\
+$time\
+$line_break\
+$character'''
+
+# ── Language Order ───────────────────────────────────────────────────────────
 [lang_order]
 order = ["c", "cpp", "cmake", "rust", "golang", "zig", "nodejs", "bun", "deno", "php", "java", "kotlin", "gradle", "scala", "python", "ruby", "lua", "perl", "haskell", "haxe", "swift", "dart", "elixir", "elm", "julia", "ocaml", "nim", "crystal", "rlang", "fennel"]
 
