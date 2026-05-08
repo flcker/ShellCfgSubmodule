@@ -1,6 +1,6 @@
 # starshipauto
 
-动态 Starship 配置生成器。将 format/palette/modules 解耦为独立数据文件，通过 Python 脚本生成所有 layout × palette 组合的最终 `.toml` 配置。
+动态 Starship 配置生成器。将 layout/separator/palette 解耦为独立数据文件，通过 Python 脚本生成所有组合的最终 `.toml` 配置。
 
 ## 快速开始
 
@@ -18,34 +18,20 @@ eval "$(starship init bash)"  # 或 zsh
 
 ## 命名规则
 
-文件命名遵循 `{layout}_{separator}_{head/tail}_{palette}` 格式，参考 Powerlevel10k 术语：
+生成文件命名格式：`{layout}_{separator}_{palette}`
 
 | 字段 | 含义 | 取值 |
 |------|------|------|
 | layout | 布局类型 | `pl`(powerline), `lean` |
-| separator | 段间分隔符 | `angled`, `round`, `slanted`, `none` |
-| head/tail | 起止帽样式 | `sharp`, `round`, `none` |
-| palette | 配色方案 | `rainbow`, `classic`, `lean` |
-
-不存在的组件补 `none`。
-
-### 当前 layouts
-
-| 文件名 | 分隔符 | 头/尾 | 说明 |
-|--------|--------|-------|------|
-| `pl_angled_sharp` | Angled  | Sharp  | 纯箭头（无起止帽） |
-| `pl_round_round` | Round  | Round  | 纯圆角 |
-| `pl_slanted_none` | Slanted  | Flat | 纯斜线（无起止帽） |
-| `pl_angled_round` | Angled  | Round  | 箭头分隔 + 圆角帽 |
-| `pl_slanted_round` | Slanted  | Round  | 斜线分隔 + 圆角帽 |
-| `lean_none_none` | — | — | Lean 风格，无背景无分隔 |
+| separator | 分隔符风格 | `angled_round`, `round_round`, `slanted_round`, `angled_sharp`, `slanted_none`, `none` |
+| palette | 配色方案 | `rainbow`, `classic`, `pastel`, `catppuccin_mocha` 等 |
 
 ### 生成示例
 
 ```
-pl_angled_sharp_rainbow.toml
-pl_round_round_classic.toml
-lean_none_none_lean.toml
+pl_angled_round_rainbow.toml
+pl_slanted_none_classic.toml
+lean_none_catppuccin_mocha.toml
 ```
 
 ## 使用 (ssc)
@@ -76,48 +62,80 @@ ssc --rebuild             # 重新生成配置
 ## 架构
 
 ```
-data/*.toml → [python generate.py] → generated/*.toml → ssc 切换
+data/
+├── layouts/       ─┐
+├── separators/     ├─→ [python generate.py] → generated/*.toml → ssc 切换
+├── palettes/      ─┘
+└── shared/
 ```
 
-- **data/layouts/** — format 模板 + metadata（palette key 要求、modules_ref、默认 fg_role）
+生成维度：`layout × compatible_separators × palette`
+
+- **data/layouts/** — 自包含的布局定义（metadata + format 模板 + 模块配置）
+- **data/separators/** — 分隔符字形定义（仅 3 个值：sep/head/tail）
 - **data/palettes/** — 命名颜色到 hex 值的映射
-- **data/modules/** — 模块定义（多个 layout 可通过 `modules_ref` 共享）
-- **data/shared/** — 跨 layout 共享数据（os_symbols, character, multiline）
+- **data/shared/** — 跨 layout 共享数据（options, os_symbols, character, multiline）
 - **engines/** — PowerShell 和 bash/zsh 的切换引擎
 - **generated/** — 输出目录（.gitignore，不入版本控制）
 
 ## 数据文件格式
 
-### Layout (`data/layouts/{layout}_{sep}_{head}.toml`)
+### Layout (`data/layouts/{name}.toml`)
+
+每个 layout 文件自包含 metadata、format 模板和全部模块定义：
 
 ```toml
 [metadata]
-name = "pl_angled_round"
-description = "Powerline with angled separators and round head/tail"
-modules_ref = "pl"          # 共享模块文件（data/modules/pl.toml）
+name = "pl"
+description = "Powerline layout with background segments"
 palette_keys = ["os_bg", "dark", "white", "blue", "green", "yellow", "red", "grey", "teal"]
 default_fg_role = "dark"
-
-[options]
-add_newline = true
-command_timeout = 10000
-scan_timeout = 1000
-fill_symbol = "─"
+compatible_separators = ["angled_round", "round_round", "slanted_round", "angled_sharp", "slanted_none"]
 
 [format]
 template = '''
-...\
-{LANG_MODULES}\
-...\
-[  $time ](fg:{FG_ROLE} bg:os_bg)\
+{HEAD:os_bg}\
+$os\
+...
+{SEP:os_bg:blue}\
+$directory\
 ...'''
+
+[lang_order]
+order = ["c", "rust", "python", ...]
+
+[modules.rust]
+symbol = "󱘗 "
+style = "bg:grey"
+format = '[[ $symbol($version) ](fg:{FG_ROLE} bg:grey)]($style)'
 ```
 
-占位符：
-- `{LANG_MODULES}` — 替换为语言模块 `$name\` 列表
-- `{FG_ROLE}` — 替换为 palette 的 `hints.fg_role` 值
+Format 模板占位符：
+- `{HEAD:color}` — 首段开口帽（separator 无此字形则省略）
+- `{SEP:prev:next}` — 左侧段间过渡 `[glyph](bg:next fg:prev)`
+- `{L_END:color}` — 左侧末段封口
+- `{R_START:color}` — 右侧首段开口
+- `{R_SEP:next:prev}` — 右侧段间过渡 `[glyph](fg:next bg:prev)`
+- `{R_TAIL:color}` — 右侧末段封口帽（separator 无此字形则省略）
+- `{LANG_MODULES}` — 展开为语言模块 `$name\` 列表
+- `{FG_ROLE}` — 由 palette 的 `hints.fg_role` 决定的前景色
 
-### Palette (`data/palettes/{palette}.toml`)
+### Separator (`data/separators/{name}.toml`)
+
+```toml
+[separators]
+sep = ""      # 段间过渡字形（右向）
+head = ""     # 首段开口帽（空=无帽）
+tail = ""     # 末段封口帽（空=无帽）
+```
+
+生成器自动推导镜像字形：
+- `r_sep` = sep 的镜像（E0B0↔E0B2, E0B4↔E0B6, E0BC↔E0BE）
+- `l_end` = tail 非空时用 tail，否则用 sep
+- `r_start` = r_sep
+- `r_tail` = tail
+
+### Palette (`data/palettes/{name}.toml`)
 
 ```toml
 [palette]
@@ -127,41 +145,21 @@ muted = "#6c6c6c"
 # ...
 
 [hints]
-fg_role = "dark"    # 推荐搭配的前景色 role
+fg_role = "dark"    # 推荐搭配的前景色 role（映射到 palette 中的颜色名）
 ```
-
-### Modules (`data/modules/{layout}.toml`)
-
-```toml
-[lang_order]
-order = ["c", "rust", "python", ...]
-
-[modules.rust]
-symbol = "󱘗 "
-style = "bg:grey"
-format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
-
-[modules.directory]
-style = "bg:blue fg:white"
-format = "[ $path ]($style)"
-# ...
-```
-
-模块中可使用 `{FG_ROLE}` 占位符，生成时自动替换。
 
 ### Shared (`data/shared/`)
 
+- **options.toml** — 全局选项（add_newline, command_timeout 等），layout 可局部覆盖
 - **character.toml** — 命令行提示符样式
-- **os_symbols.toml** — 操作系统图标映射
+- **os_symbols.toml** — 操作系统图标映射（50 个 Nerd Font 图标）
 - **multiline.toml** — 多行标识（╭─/╰─），自动注入含 `$line_break` 的 layout
 
-```toml
-[multiline]
-top_prefix = "[╭─]({STYLE})"
-bottom_prefix = "[╰─]({STYLE})"
-style = "fg:muted"
-fallback_style = "fg:grey"
-```
+## 新增 separator
+
+1. 在 `data/separators/` 下创建 `{name}.toml`，定义 3 个字形
+2. 在目标 layout 的 `compatible_separators` 列表中加入名称
+3. 运行 `python generate.py`
 
 ## 新增 palette
 
@@ -171,13 +169,17 @@ fallback_style = "fg:grey"
 
 ## 新增 layout
 
-1. 在 `data/layouts/` 下创建 `{layout}_{sep}_{head}.toml`
-2. 设置 `modules_ref` 指向已有模块文件，或在 `data/modules/` 下创建新文件
+1. 在 `data/layouts/` 下创建 `{name}.toml`
+2. 定义 metadata（含 `compatible_separators`）、format 模板和全部模块配置
 3. 运行 `python generate.py`
 
 ## 兼容性
 
-生成器会自动检查 palette 与 layout 的兼容性（palette 的 keys 必须覆盖 layout 要求的 `palette_keys`）。不兼容的组合会被跳过。
+生成器自动检查：
+- palette 的 keys 必须覆盖 layout 要求的 `palette_keys`
+- layout 只与其 `compatible_separators` 中列出的 separator 组合
+
+不兼容的组合会被跳过。
 
 ## 添加为 submodule
 
@@ -194,7 +196,6 @@ git commit -m "feat: add starshipauto submodule"
 ### 首次创建（新仓库初始化）
 
 ```bash
-# 在 submodule/starshipauto 目录中初始化
 cd submodule/starshipauto
 git init
 git checkout -b starshipauto
@@ -203,7 +204,6 @@ git commit -m "feat: initial starshipauto module"
 git remote add origin git@github.com:flcker/ShellCfgSubmodule.git
 git push -u origin starshipauto
 
-# 回到父仓库，删除后重新挂载为 submodule
 cd ../..
 rm -rf submodule/starshipauto
 git submodule add -b starshipauto git@github.com:flcker/ShellCfgSubmodule.git submodule/starshipauto
