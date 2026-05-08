@@ -1,0 +1,20 @@
+[palette]
+os_bg = "#dce0e8"
+dark = "#4c4f69"
+white = "#eff1f5"
+blue = "#7287b8"
+green = "#7db87d"
+yellow = "#c4a55a"
+red = "#c47070"
+grey = "#bcc0cc"
+teal = "#6da5a5"
+muted = "#9ca0b0"
+sys_lang = "#7287b8"
+web_lang = "#7db87d"
+jvm_lang = "#c49060"
+script_lang = "#a07db8"
+func_lang = "#6da5a5"
+env_color = "#7da5b8"
+
+[hints]
+fg_role = "dark"

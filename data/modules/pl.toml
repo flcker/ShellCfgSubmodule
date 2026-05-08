@@ -20,13 +20,13 @@ format = '[@$hostname ]($style)'
 
 # ── Directory ─────────────────────────────────────────────────────────────────
 [modules.directory]
-style = "bg:blue fg:white"
+style = "bg:blue fg:{FG_ROLE}"
 format = "[ $path ]($style)"
 truncation_length = 4
 truncation_symbol = "…/"
 fish_style_pwd_dir_length = 1
 read_only = " 󰌾"
-read_only_style = "bg:blue fg:white"
+read_only_style = "bg:blue fg:{FG_ROLE}"
 
 [modules.directory_substitutions]
 "~" = " "
@@ -44,21 +44,21 @@ read_only_style = "bg:blue fg:white"
 # ── Git ───────────────────────────────────────────────────────────────────────
 [modules.git_branch]
 symbol = " "
-style = "bg:green fg:dark"
-format = '[[ $symbol$branch ](fg:dark bg:green)]($style)'
+style = "bg:green fg:{FG_ROLE}"
+format = '[[ $symbol$branch ](fg:{FG_ROLE} bg:green)]($style)'
 
 [modules.git_status]
 style = "bg:green"
 format = '([[$all_status$ahead_behind ](bg:green)]($style))'
 conflicted = "[⚔${count}](fg:red bg:green)"
 untracked = "[?${count}](fg:yellow bg:green)"
-stashed = "[≡${count}](fg:dark bg:green)"
+stashed = "[≡${count}](fg:{FG_ROLE} bg:green)"
 modified = "[!${count}](fg:yellow bg:green)"
-staged = "[+${count}](fg:dark bg:green)"
+staged = "[+${count}](fg:{FG_ROLE} bg:green)"
 renamed = "[»${count}](fg:yellow bg:green)"
 deleted = "[✘${count}](fg:red bg:green)"
-ahead = "[⇡${count}](fg:dark bg:green)"
-behind = "[⇣${count}](fg:dark bg:green)"
+ahead = "[⇡${count}](fg:{FG_ROLE} bg:green)"
+behind = "[⇣${count}](fg:{FG_ROLE} bg:green)"
 diverged = "[⇕⇡${ahead_count}⇣${behind_count}](fg:yellow bg:green)"
 up_to_date = ""
 
@@ -69,167 +69,167 @@ tag_symbol = '  '
 [modules.c]
 symbol = " "
 style = "bg:grey"
-format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+format = '[[ $symbol($version) ](fg:{FG_ROLE} bg:grey)]($style)'
 
 [modules.cpp]
 symbol = " "
 style = "bg:grey"
-format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+format = '[[ $symbol($version) ](fg:{FG_ROLE} bg:grey)]($style)'
 
 [modules.cmake]
 symbol = " "
 style = "bg:grey"
-format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+format = '[[ $symbol($version) ](fg:{FG_ROLE} bg:grey)]($style)'
 
 [modules.rust]
 symbol = "󱘗 "
 style = "bg:grey"
-format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+format = '[[ $symbol($version) ](fg:{FG_ROLE} bg:grey)]($style)'
 
 [modules.golang]
 symbol = " "
 style = "bg:grey"
-format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+format = '[[ $symbol($version) ](fg:{FG_ROLE} bg:grey)]($style)'
 
 [modules.nodejs]
 symbol = " "
 style = "bg:grey"
-format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+format = '[[ $symbol($version) ](fg:{FG_ROLE} bg:grey)]($style)'
 
 [modules.bun]
 symbol = " "
 style = "bg:grey"
-format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+format = '[[ $symbol($version) ](fg:{FG_ROLE} bg:grey)]($style)'
 
 [modules.deno]
 symbol = " "
 style = "bg:grey"
-format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+format = '[[ $symbol($version) ](fg:{FG_ROLE} bg:grey)]($style)'
 
 [modules.php]
 symbol = " "
 style = "bg:grey"
-format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+format = '[[ $symbol($version) ](fg:{FG_ROLE} bg:grey)]($style)'
 
 [modules.java]
 symbol = " "
 style = "bg:grey"
-format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+format = '[[ $symbol($version) ](fg:{FG_ROLE} bg:grey)]($style)'
 
 [modules.kotlin]
 symbol = " "
 style = "bg:grey"
-format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+format = '[[ $symbol($version) ](fg:{FG_ROLE} bg:grey)]($style)'
 
 [modules.gradle]
 symbol = " "
 style = "bg:grey"
-format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+format = '[[ $symbol($version) ](fg:{FG_ROLE} bg:grey)]($style)'
 
 [modules.haskell]
 symbol = " "
 style = "bg:grey"
-format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+format = '[[ $symbol($version) ](fg:{FG_ROLE} bg:grey)]($style)'
 
 [modules.haxe]
 symbol = " "
 style = "bg:grey"
-format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+format = '[[ $symbol($version) ](fg:{FG_ROLE} bg:grey)]($style)'
 
 [modules.python]
 symbol = " "
 style = "bg:grey"
-format = '[[ $symbol($version)(\($virtualenv\)) ](fg:white bg:grey)]($style)'
+format = '[[ $symbol($version)(\($virtualenv\)) ](fg:{FG_ROLE} bg:grey)]($style)'
 
 [modules.ruby]
 symbol = " "
 style = "bg:grey"
-format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+format = '[[ $symbol($version) ](fg:{FG_ROLE} bg:grey)]($style)'
 
 [modules.lua]
 symbol = " "
 style = "bg:grey"
-format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+format = '[[ $symbol($version) ](fg:{FG_ROLE} bg:grey)]($style)'
 
 [modules.swift]
 symbol = " "
 style = "bg:grey"
-format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+format = '[[ $symbol($version) ](fg:{FG_ROLE} bg:grey)]($style)'
 
 [modules.zig]
 symbol = " "
 style = "bg:grey"
-format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+format = '[[ $symbol($version) ](fg:{FG_ROLE} bg:grey)]($style)'
 
 [modules.scala]
 symbol = " "
 style = "bg:grey"
-format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+format = '[[ $symbol($version) ](fg:{FG_ROLE} bg:grey)]($style)'
 
 [modules.dart]
 symbol = " "
 style = "bg:grey"
-format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+format = '[[ $symbol($version) ](fg:{FG_ROLE} bg:grey)]($style)'
 
 [modules.elixir]
 symbol = " "
 style = "bg:grey"
-format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+format = '[[ $symbol($version) ](fg:{FG_ROLE} bg:grey)]($style)'
 
 [modules.elm]
 symbol = " "
 style = "bg:grey"
-format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+format = '[[ $symbol($version) ](fg:{FG_ROLE} bg:grey)]($style)'
 
 [modules.julia]
 symbol = " "
 style = "bg:grey"
-format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+format = '[[ $symbol($version) ](fg:{FG_ROLE} bg:grey)]($style)'
 
 [modules.perl]
 symbol = " "
 style = "bg:grey"
-format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+format = '[[ $symbol($version) ](fg:{FG_ROLE} bg:grey)]($style)'
 
 [modules.ocaml]
 symbol = " "
 style = "bg:grey"
-format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+format = '[[ $symbol($version) ](fg:{FG_ROLE} bg:grey)]($style)'
 
 [modules.nim]
 symbol = "󰆥 "
 style = "bg:grey"
-format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+format = '[[ $symbol($version) ](fg:{FG_ROLE} bg:grey)]($style)'
 
 [modules.crystal]
 symbol = " "
 style = "bg:grey"
-format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+format = '[[ $symbol($version) ](fg:{FG_ROLE} bg:grey)]($style)'
 
 [modules.rlang]
 symbol = "󰟔 "
 style = "bg:grey"
-format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+format = '[[ $symbol($version) ](fg:{FG_ROLE} bg:grey)]($style)'
 
 [modules.fennel]
 symbol = " "
 style = "bg:grey"
-format = '[[ $symbol($version) ](fg:white bg:grey)]($style)'
+format = '[[ $symbol($version) ](fg:{FG_ROLE} bg:grey)]($style)'
 
 # ── Containers / Environments ─────────────────────────────────────────────────
 [modules.docker_context]
 symbol = " "
 style = "bg:teal"
-format = '[[ $symbol($context) ](fg:white bg:teal)]($style)'
+format = '[[ $symbol($context) ](fg:{FG_ROLE} bg:teal)]($style)'
 
 [modules.nix_shell]
 symbol = " "
 style = "bg:teal"
-format = '[[ $symbol$state( \($name\)) ](fg:white bg:teal)]($style)'
+format = '[[ $symbol$state( \($name\)) ](fg:{FG_ROLE} bg:teal)]($style)'
 
 [modules.conda]
 symbol = "  "
-style = "fg:white bg:teal"
+style = "fg:{FG_ROLE} bg:teal"
 format = '[$symbol$environment ]($style)'
 ignore_base = false
 

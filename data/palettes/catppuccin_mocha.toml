@@ -1,0 +1,24 @@
+[palette]
+# Segment backgrounds (matching starship catppuccin-powerline preset order)
+os_bg = "#f38ba8"
+blue = "#fab387"
+green = "#f9e2af"
+grey = "#a6e3a1"
+teal = "#74c7ec"
+# Text colors
+dark = "#11111b"
+white = "#cdd6f4"
+# Utility
+red = "#f38ba8"
+yellow = "#f9e2af"
+muted = "#6c7086"
+# Lean mode language groups
+sys_lang = "#89b4fa"
+web_lang = "#a6e3a1"
+jvm_lang = "#fab387"
+script_lang = "#cba6f7"
+func_lang = "#94e2d5"
+env_color = "#89dceb"
+
+[hints]
+fg_role = "dark"

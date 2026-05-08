@@ -9,6 +9,12 @@ red = "#d70000"
 grey = "#4e4e4e"
 teal = "#005f87"
 muted = "#6c6c6c"
+sys_lang = "#5f87d7"
+web_lang = "#87af00"
+jvm_lang = "#d78700"
+script_lang = "#af5faf"
+func_lang = "#00afaf"
+env_color = "#5f5faf"
 
 [hints]
 fg_role = "dark"

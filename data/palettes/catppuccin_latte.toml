@@ -1,0 +1,24 @@
+[palette]
+# Segment backgrounds
+os_bg = "#d20f39"
+blue = "#fe640b"
+green = "#df8e1d"
+grey = "#40a02b"
+teal = "#209fb5"
+# Text colors
+dark = "#dce0e8"
+white = "#4c4f69"
+# Utility
+red = "#d20f39"
+yellow = "#df8e1d"
+muted = "#9ca0b0"
+# Lean mode language groups
+sys_lang = "#1e66f5"
+web_lang = "#40a02b"
+jvm_lang = "#fe640b"
+script_lang = "#8839ef"
+func_lang = "#179299"
+env_color = "#04a5e5"
+
+[hints]
+fg_role = "dark"
