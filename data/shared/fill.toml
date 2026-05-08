@@ -1,0 +1,5 @@
+[fill]
+# supports: "─"、"━"、"═"、"."、"*"、"·"、" "、"☆"、"★"、
+symbol = "·"
+style = "fg:muted"
+fallback_style = "fg:grey"

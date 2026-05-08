@@ -193,7 +193,16 @@ def generate_config(
     options = dict(shared.get("options", {}).get("options", {}))
     options.update(layout.get("options", {}))
     lang_order = layout["lang_order"]["order"]
-    all_modules = layout["modules"]
+    all_modules = {k: dict(v) if isinstance(v, dict) else v for k, v in layout["modules"].items()}
+    fill_cfg = shared.get("fill", {}).get("fill", {})
+    if fill_cfg and "fill" in all_modules:
+        if "symbol" in fill_cfg:
+            all_modules["fill"]["symbol"] = fill_cfg["symbol"]
+        style = fill_cfg.get("style", "")
+        if style and "muted" not in palette["palette"]:
+            style = fill_cfg.get("fallback_style", "fg:grey")
+        if style:
+            all_modules["fill"]["style"] = style
 
     starship_palette_name = palette_name.replace("-", "_")
 
