@@ -1,0 +1,5 @@
+[multiline]
+top_prefix = "[╭─]({STYLE})"
+bottom_prefix = "[╰─]({STYLE})"
+style = "fg:muted"
+fallback_style = "fg:grey"

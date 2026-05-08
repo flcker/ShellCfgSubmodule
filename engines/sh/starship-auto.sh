@@ -43,12 +43,6 @@ _starshipauto_get_path() {
         return 0
     fi
 
-    # Legacy aliases for generated configs
-    case "$name" in
-        p10kr|p10krainbow)  echo "$_STARSHIPAUTO_GENERATED/p10k-powerline-rainbow.toml"; return 0 ;;
-        p10kc|p10kclassic)  echo "$_STARSHIPAUTO_GENERATED/p10k-powerline-classic.toml"; return 0 ;;
-        p10kl|p10klean)     echo "$_STARSHIPAUTO_GENERATED/p10k-lean-lean.toml"; return 0 ;;
-    esac
 
     # Static configs
     case "$name" in

@@ -1,6 +1,7 @@
 [metadata]
-name = "p10k-lean"
-description = "Powerlevel10k lean style - no backgrounds, no separators, pure foreground colors"
+name = "lean_none_none"
+description = "Lean style, no separators, no head/tail"
+modules_ref = "lean"
 palette_keys = ["blue", "green", "yellow", "red", "muted", "sys_lang", "web_lang", "jvm_lang", "script_lang", "func_lang", "env_color"]
 default_fg_role = ""
 

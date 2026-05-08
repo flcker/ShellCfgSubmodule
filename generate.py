@@ -42,8 +42,9 @@ def load_all_palettes() -> dict[str, dict]:
     return palettes
 
 
-def load_modules(layout_name: str) -> dict | None:
-    path = DATA_DIR / "modules" / f"{layout_name}.toml"
+def load_modules(layout_name: str, layout: dict) -> dict | None:
+    ref = layout.get("metadata", {}).get("modules_ref", layout_name)
+    path = DATA_DIR / "modules" / f"{ref}.toml"
     if path.exists():
         return load_toml(path)
     return None
@@ -129,6 +130,17 @@ def generate_config(
     format_str = format_template.replace("{LANG_MODULES}", lang_modules_str)
     format_str = format_str.replace("{FG_ROLE}", fg_role)
 
+    # ── Multiline injection ─────────────────────────────────────────────────
+    multiline_cfg = shared.get("multiline", {}).get("multiline", {})
+    if multiline_cfg and "$line_break" in format_str:
+        style = multiline_cfg["style"]
+        if "muted" not in palette["palette"]:
+            style = multiline_cfg.get("fallback_style", "fg:grey")
+        top = multiline_cfg["top_prefix"].replace("{STYLE}", style)
+        bottom = multiline_cfg["bottom_prefix"].replace("{STYLE}", style)
+        format_str = f"{top}\\\n{format_str}"
+        format_str = format_str.replace("$line_break", f"$line_break\\\n{bottom}")
+
     format_section = f'format = """\n{format_str}"""'
     sections.append(format_section)
 
@@ -211,7 +223,7 @@ def main():
     generated_count = 0
 
     for layout_name, layout in sorted(layouts.items()):
-        modules_data = load_modules(layout_name)
+        modules_data = load_modules(layout_name, layout)
         if not modules_data:
             print(f"Warning: No modules file for layout '{layout_name}', skipping", file=sys.stderr)
             continue
@@ -220,7 +232,7 @@ def main():
             if not is_compatible(layout, palette):
                 continue
 
-            config_name = f"{layout_name}-{palette_name.removeprefix('p10k-') if palette_name.startswith('p10k-') else palette_name}"
+            config_name = f"{layout_name}_{palette_name}"
             filename = f"{config_name}.toml"
             output_path = GENERATED_DIR / filename
 

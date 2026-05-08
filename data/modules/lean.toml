@@ -13,7 +13,7 @@ disabled = true
 ssh_only = true
 style = "bold fg:yellow"
 format = '[$ssh_symbol$hostname ]($style)'
-ssh_symbol = "󰣀 "
+ssh_symbol = "ssh:"
 
 # ── Directory ─────────────────────────────────────────────────────────────────
 [modules.directory]
@@ -22,25 +22,14 @@ format = "[$path ]($style)"
 truncation_length = 4
 truncation_symbol = "…/"
 fish_style_pwd_dir_length = 1
-read_only = " 󰌾"
+read_only = "RO"
 read_only_style = "fg:red"
 
 [modules.directory_substitutions]
-"~" = " "
-"Desktop" = " "
-"Documents" = "󰈙 "
-"Downloads" = " "
-"Music" = "󰝚 "
-"Musics" = "󰝚 "
-"Video" = " "
-"Videos" = " "
-"Pictures" = " "
-"Developer" = "󰲋 "
-"Workspace" = "󰕮 "
 
 # ── Git ───────────────────────────────────────────────────────────────────────
 [modules.git_branch]
-symbol = " "
+symbol = ""
 style = "fg:green"
 format = '[$symbol$branch ]($style)'
 
@@ -64,11 +53,11 @@ style = "fg:red"
 format = '\([$state( $progress_current/$progress_total)]($style)\) '
 
 [modules.git_commit]
-tag_symbol = '  '
+tag_symbol = ' tag:'
 
 # ── Languages: System ─────────────────────────────────────────────────────────
 [modules.c]
-symbol = " "
+symbol = ""
 style = "fg:sys_lang"
 format = '[$symbol($version) ]($style)'
 

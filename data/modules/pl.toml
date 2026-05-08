@@ -29,17 +29,17 @@ read_only = " 󰌾"
 read_only_style = "bg:blue fg:white"
 
 [modules.directory_substitutions]
-"~" = " "
-"Desktop" = " "
+"~" = " "
+"Desktop" = " "
 "Documents" = "󰈙 "
-"Downloads" = " "
-"Music" = "󰝚 "
-"Musics" = "󰝚 "
-"Video" = " "
-"Videos" = " "
-"Pictures" = " "
-"Developer" = "󰲋 "
-"Workspace" = "󰕮 "
+"Downloads" = " "
+"Music" = "󰶚 "
+"Musics" = "󰶚 "
+"Video" = " "
+"Videos" = " "
+"Pictures" = " "
+"Developer" = "󰲶 "
+"Workspace" = "󰮮 "
 
 # ── Git ───────────────────────────────────────────────────────────────────────
 [modules.git_branch]

@@ -8,6 +8,7 @@ yellow = "#c49000"
 red = "#c62828"
 grey = "#262626"
 teal = "#1a5276"
+muted = "#6c6c6c"
 
 [hints]
 fg_role = "white"
