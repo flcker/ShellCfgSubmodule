@@ -16,16 +16,62 @@ source /path/to/starshipauto/engines/sh/starship-auto.sh
 eval "$(starship init bash)"  # 或 zsh
 ```
 
-## 使用
+## 命名规则
+
+文件命名遵循 `{layout}_{separator}_{head/tail}_{palette}` 格式，参考 Powerlevel10k 术语：
+
+| 字段 | 含义 | 取值 |
+|------|------|------|
+| layout | 布局类型 | `pl`(powerline), `lean` |
+| separator | 段间分隔符 | `angled`, `round`, `slanted`, `none` |
+| head/tail | 起止帽样式 | `sharp`, `round`, `none` |
+| palette | 配色方案 | `rainbow`, `classic`, `lean` |
+
+不存在的组件补 `none`。
+
+### 当前 layouts
+
+| 文件名 | 分隔符 | 头/尾 | 说明 |
+|--------|--------|-------|------|
+| `pl_angled_sharp` | Angled  | Sharp  | 纯箭头（无起止帽） |
+| `pl_round_round` | Round  | Round  | 纯圆角 |
+| `pl_slanted_none` | Slanted  | Flat | 纯斜线（无起止帽） |
+| `pl_angled_round` | Angled  | Round  | 箭头分隔 + 圆角帽 |
+| `pl_slanted_round` | Slanted  | Round  | 斜线分隔 + 圆角帽 |
+| `lean_none_none` | — | — | Lean 风格，无背景无分隔 |
+
+### 生成示例
+
+```
+pl_angled_sharp_rainbow.toml
+pl_round_round_classic.toml
+lean_none_none_lean.toml
+```
+
+## 使用 (ssc)
 
 ```bash
-ssc p10k-powerline-rainbow    # 切换到生成的配置
-ssc p10kr                     # 简写别名
-ssc p10kc                     # p10k-powerline-classic
-ssc p10kl                     # p10k-lean-lean
-ssc --list                    # 列出所有可用配置
-ssc --rebuild                 # 重新生成配置
+# 前缀匹配（输入唯一前缀即可切换）
+ssc pl_round              # 匹配 pl_round_round_*
+ssc ang_s                 # 匹配 pl_angled_sharp_*
+
+# 按类型筛选 + 序号
+ssc -t a                  # 列出 starshipauto 配置（带序号）
+ssc -t a 3               # 切换到第 3 个 auto 配置
+ssc -t s                  # 列出 starship 静态配置（带序号）
+ssc -t s 2               # 切换到第 2 个静态配置
+
+# 锁定/解锁
+ssc --lock                # 锁定当前配置（后续 session 默认使用）
+ssc --lock pl_round       # 锁定指定配置（支持前缀匹配）
+ssc --unlock              # 解除锁定，恢复随机模式
+
+# 其他
+ssc --list                # 列出所有可用配置
+ssc --rebuild             # 重新生成配置
 ```
+
+启动行为：有锁定配置则使用锁定，否则从全部配置池中随机选择。
 
 ## 架构
 
@@ -33,20 +79,22 @@ ssc --rebuild                 # 重新生成配置
 data/*.toml → [python generate.py] → generated/*.toml → ssc 切换
 ```
 
-- **data/layouts/** — format 模板 + metadata（palette key 要求、默认 fg_role）
+- **data/layouts/** — format 模板 + metadata（palette key 要求、modules_ref、默认 fg_role）
 - **data/palettes/** — 命名颜色到 hex 值的映射
-- **data/modules/** — 每个 layout 的完整模块定义
-- **data/shared/** — 跨 layout 共享数据（os_symbols, character）
+- **data/modules/** — 模块定义（多个 layout 可通过 `modules_ref` 共享）
+- **data/shared/** — 跨 layout 共享数据（os_symbols, character, multiline）
 - **engines/** — PowerShell 和 bash/zsh 的切换引擎
 - **generated/** — 输出目录（.gitignore，不入版本控制）
 
 ## 数据文件格式
 
-### Layout (`data/layouts/<name>.toml`)
+### Layout (`data/layouts/{layout}_{sep}_{head}.toml`)
 
 ```toml
 [metadata]
-name = "p10k-powerline"
+name = "pl_angled_round"
+description = "Powerline with angled separators and round head/tail"
+modules_ref = "pl"          # 共享模块文件（data/modules/pl.toml）
 palette_keys = ["os_bg", "dark", "white", "blue", "green", "yellow", "red", "grey", "teal"]
 default_fg_role = "dark"
 
@@ -54,6 +102,7 @@ default_fg_role = "dark"
 add_newline = true
 command_timeout = 10000
 scan_timeout = 1000
+fill_symbol = "─"
 
 [format]
 template = '''
@@ -68,19 +117,20 @@ template = '''
 - `{LANG_MODULES}` — 替换为语言模块 `$name\` 列表
 - `{FG_ROLE}` — 替换为 palette 的 `hints.fg_role` 值
 
-### Palette (`data/palettes/<name>.toml`)
+### Palette (`data/palettes/{palette}.toml`)
 
 ```toml
 [palette]
 os_bg = "#d0d0d0"
 blue = "#005fd7"
+muted = "#6c6c6c"
 # ...
 
 [hints]
 fg_role = "dark"    # 推荐搭配的前景色 role
 ```
 
-### Modules (`data/modules/<layout-name>.toml`)
+### Modules (`data/modules/{layout}.toml`)
 
 ```toml
 [lang_order]
@@ -99,16 +149,30 @@ format = "[ $path ]($style)"
 
 模块中可使用 `{FG_ROLE}` 占位符，生成时自动替换。
 
+### Shared (`data/shared/`)
+
+- **character.toml** — 命令行提示符样式
+- **os_symbols.toml** — 操作系统图标映射
+- **multiline.toml** — 多行标识（╭─/╰─），自动注入含 `$line_break` 的 layout
+
+```toml
+[multiline]
+top_prefix = "[╭─]({STYLE})"
+bottom_prefix = "[╰─]({STYLE})"
+style = "fg:muted"
+fallback_style = "fg:grey"
+```
+
 ## 新增 palette
 
-1. 在 `data/palettes/` 下创建 `<name>.toml`
+1. 在 `data/palettes/` 下创建 `{name}.toml`
 2. 确保包含目标 layout 的所有 `palette_keys`
 3. 运行 `python generate.py`（或 `ssc --rebuild`）
 
 ## 新增 layout
 
-1. 在 `data/layouts/` 下创建 `<name>.toml`（定义 format 模板）
-2. 在 `data/modules/` 下创建同名 `<name>.toml`（定义模块）
+1. 在 `data/layouts/` 下创建 `{layout}_{sep}_{head}.toml`
+2. 设置 `modules_ref` 指向已有模块文件，或在 `data/modules/` 下创建新文件
 3. 运行 `python generate.py`
 
 ## 兼容性
