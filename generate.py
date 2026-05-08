@@ -105,7 +105,8 @@ def generate_config(
     shared: dict,
 ) -> str:
     fg_role = palette.get("hints", {}).get("fg_role", layout["metadata"]["default_fg_role"])
-    options = layout["options"]
+    options = dict(shared.get("options", {}).get("options", {}))
+    options.update(layout.get("options", {}))
     lang_order = modules_data["lang_order"]["order"]
     all_modules = modules_data["modules"]
 

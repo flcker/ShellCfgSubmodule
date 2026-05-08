@@ -1,0 +1,5 @@
+[options]
+add_newline = true
+command_timeout = 10000
+scan_timeout = 1000
+fill_symbol = "─"

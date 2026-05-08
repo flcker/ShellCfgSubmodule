@@ -5,12 +5,6 @@ modules_ref = "lean"
 palette_keys = ["blue", "green", "yellow", "red", "muted", "sys_lang", "web_lang", "jvm_lang", "script_lang", "func_lang", "env_color"]
 default_fg_role = ""
 
-[options]
-add_newline = true
-command_timeout = 10000
-scan_timeout = 1000
-fill_symbol = "─"
-
 [format]
 template = '''
 $hostname\

@@ -5,12 +5,6 @@ modules_ref = "pl"
 palette_keys = ["os_bg", "dark", "white", "blue", "green", "yellow", "red", "grey", "teal"]
 default_fg_role = "dark"
 
-[options]
-add_newline = true
-command_timeout = 10000
-scan_timeout = 1000
-fill_symbol = "─"
-
 [format]
 template = '''
 [](fg:os_bg)\
