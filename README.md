@@ -151,6 +151,7 @@ fg_role = "dark"    # 推荐搭配的前景色 role（映射到 palette 中的�
 ### Shared (`data/shared/`)
 
 - **options.toml** — 全局选项（add_newline, command_timeout 等），layout 可局部覆盖
+- **fill.toml** — fill 模块样式（symbol、style、fallback_style），覆盖 layout 中的 fill 定义
 - **character.toml** — 命令行提示符样式
 - **os_symbols.toml** — 操作系统图标映射（50 个 Nerd Font 图标）
 - **multiline.toml** — 多行标识（╭─/╰─），自动注入含 `$line_break` 的 layout
