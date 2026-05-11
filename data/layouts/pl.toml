@@ -15,6 +15,7 @@ compatible_separators = ["angled_round", "round_round", "slanted_round", "angled
 #   {L_END:color}        — 左侧末段封口
 #   {R_START:color}      — 右侧首段开口
 #   {R_SEP:next:prev}    — 右侧段间过渡 [glyph](fg:next bg:prev)
+#   {R_END:color}        — 右侧末段封口（同 L_END 逻辑）
 #   {R_TAIL:color}       — 右侧末段封口帽（无则省略）
 #   {LANG_MODULES}       — 展开为所有语言模块变量
 #   {FG_ROLE}            — 由 palette hints.fg_role 决定的前景色
@@ -41,9 +42,8 @@ $fill\
 $jobs\
 $status\
 $cmd_duration\
-{R_SEP:os_bg:grey}\
-[  $time ](fg:{FG_ROLE} bg:os_bg)\
-{R_TAIL:os_bg}\
+{R_END:grey}\
+$time\
 $line_break\
 $character'''
 
@@ -320,8 +320,8 @@ disabled = false
 [modules.time]
 disabled = false
 time_format = "%R"
-style = "fg:{FG_ROLE} bg:os_bg"
-format = '  $time '
+style = "fg:muted"
+format = ' $time '
 
 # ── Line Break ────────────────────────────────────────────────────────────────
 [modules.line_break]

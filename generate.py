@@ -128,6 +128,12 @@ def apply_separators(format_str: str, glyphs: dict) -> str:
             return f"[{glyphs['r_sep']}](fg:{next_c} bg:{prev})"
         return ""
 
+    def replace_r_end(m):
+        color = m.group(1)
+        if glyphs["l_end"]:
+            return f"[{glyphs['l_end']}](fg:{color})"
+        return ""
+
     def replace_r_tail(m):
         color = m.group(1)
         if glyphs["r_tail"]:
@@ -139,6 +145,7 @@ def apply_separators(format_str: str, glyphs: dict) -> str:
     format_str = re.sub(r"\{L_END:([^}]+)\}", replace_l_end, format_str)
     format_str = re.sub(r"\{R_START:([^}]+)\}", replace_r_start, format_str)
     format_str = re.sub(r"\{R_SEP:([^:}]+):([^}]+)\}", replace_r_sep, format_str)
+    format_str = re.sub(r"\{R_END:([^}]+)\}", replace_r_end, format_str)
     format_str = re.sub(r"\{R_TAIL:([^}]+)\}", replace_r_tail, format_str)
 
     # Clean up empty lines left by removed placeholders (empty placeholder + backslash-newline)
