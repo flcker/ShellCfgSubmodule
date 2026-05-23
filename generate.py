@@ -300,6 +300,26 @@ def generate_config(
         char_config = shared["character"]["character"]
         sections.append(emit_module_section("character", char_config, fg_role))
 
+    # ── Transient prompt profile (shared) ─────────────────────────────────────
+    if "transient_prompt" in shared:
+        tp = shared["transient_prompt"]
+        tp_format = tp["transient_prompt"]["template"]
+        tp_format = apply_separators(tp_format, glyphs)
+        sections.append(f"[profiles]\ntransient = {toml_quote(tp_format)}")
+
+        for key in ("env_var_dir", "env_var_time"):
+            if key in tp:
+                cfg = tp[key]
+                var_name = cfg["variable"]
+                lines = [f"[env_var.{var_name}]"]
+                for k, v in cfg.items():
+                    if k == "variable":
+                        lines.append(f"variable = {toml_quote(v)}")
+                    else:
+                        actual = v.replace("{FG_ROLE}", fg_role) if isinstance(v, str) else v
+                        lines.append(f"{k} = {toml_quote(actual)}")
+                sections.append("\n".join(lines))
+
     # ── Palette ───────────────────────────────────────────────────────────────
     palette_lines = [f"[palettes.{starship_palette_name}]"]
     for k, v in palette["palette"].items():

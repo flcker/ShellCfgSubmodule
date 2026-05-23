@@ -1,0 +1,12 @@
+[transient_prompt]
+template = '{HEAD:blue}${env_var.STARSHIP_TRANSIENT_DIR}{SEP:blue:grey}${env_var.STARSHIP_TRANSIENT_TIME}{L_END:grey} $character'
+
+[env_var_dir]
+variable = 'STARSHIP_TRANSIENT_DIR'
+style = 'bg:blue fg:{FG_ROLE}'
+format = '[ $env_value ]($style)'
+
+[env_var_time]
+variable = 'STARSHIP_TRANSIENT_TIME'
+style = 'bg:grey fg:{FG_ROLE}'
+format = '[ $env_value ]($style)'
