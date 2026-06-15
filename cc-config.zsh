@@ -72,6 +72,74 @@ _cc_config_get() {
 }
 
 # ============================================================
+# 生成默认配置（仅注释，不覆盖已有）
+# ============================================================
+
+_cc_config_init() {
+    local file="$CC_CONFIG_FILE"
+
+    if [[ -f "$file" ]]; then
+        echo "${C_YELLOW}配置文件已存在: ${file}${C_RESET}"
+        echo "${C_DARK_GRAY}  如需覆盖请先删除或指定 CC_CONFIG_FILE 为新路径${C_RESET}"
+        return 1
+    fi
+
+    mkdir -p "$(dirname "$file")"
+
+    cat > "$file" << 'CONFEOF'
+# ============================================================
+# cc-tools 厂商配置
+# ============================================================
+# 格式: vendor.<name>.<field>=<value>
+#   name   — 厂商简称，即 cc vendor <name> 的参数
+#   url    — API 地址（可选，Claude 官方可省略默认走 api.anthropic.com）
+#   key    — API 密钥（必需）
+#   models — 默认模型，逗号分隔: opus,sonnet,haiku
+#            单模型厂商可省略此行，使用内置默认
+#            多模型厂商（TAL/火山等）必填
+#
+# auto = 启动时自动切换的厂商（可选）
+# ============================================================
+
+# --- TAL Coding（公司多模型代理）---
+#vendor.tal.url=http://ai-service.tal.com/coding
+#vendor.tal.key=sk-...
+#vendor.tal.models=claude-opus-4.8,deepseek-v4-pro,deepseek-v4-flash
+
+# --- DeepSeek（自购）---
+#vendor.ds.url=https://api.deepseek.com
+#vendor.ds.key=sk-...
+
+# --- GLM（智谱）---
+#vendor.glm.url=https://open.bigmodel.cn/api/paas/v4
+#vendor.glm.key=sk-...
+
+# --- Claude 官方 ---
+#vendor.claude.key=sk-ant-...
+
+# --- GPT（OpenAI 兼容）---
+#vendor.gpt.url=https://api.openai.com/v1
+#vendor.gpt.key=sk-...
+
+# --- 火山引擎 ---
+#vendor.volc.url=https://ark.cn-beijing.volces.com/api/v3
+#vendor.volc.key=sk-...
+#vendor.volc.models=deepseek-v4-pro,deepseek-v4-pro,deepseek-v4-flash
+
+# --- 自定义厂商（模板）---
+#vendor.xxx.url=https://your-api.example.com
+#vendor.xxx.key=sk-...
+#vendor.xxx.models=opus-model,sonnet-model,haiku-model
+
+#auto=tal
+CONFEOF
+
+    chmod 600 "$file"
+    echo "${C_GREEN}✓ 已生成配置模板: ${file}${C_RESET}"
+    echo "${C_DARK_GRAY}  请编辑填入实际值后重新打开 shell${C_RESET}"
+}
+
+# ============================================================
 # 自动加载
 # ============================================================
 

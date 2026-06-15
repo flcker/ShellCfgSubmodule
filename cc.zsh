@@ -30,6 +30,7 @@ _cc_help() {
     echo "${C_DARK_GRAY}══ ${C_GREEN}cc${C_RESET} — Claude Code 统一入口 ${C_DARK_GRAY}══${C_RESET}"
     echo ""
     echo "  ${C_DARK_GRAY}厂商${C_RESET}"
+    echo "    ${C_GREEN}cc config init${C_RESET}       生成默认配置文件"
     echo "    ${C_GREEN}cc vendor${C_RESET}           列出已配置厂商"
     echo "    ${C_GREEN}cc vendor <name>${C_RESET}    切换厂商（自动应用默认模型）"
     echo ""
@@ -101,6 +102,19 @@ cc() {
             fi
             ;;
 
+        # 配置
+        config)
+            shift
+            case "${1:-}" in
+                init)
+                    _cc_config_init
+                    ;;
+                *)
+                    echo "${C_DARK_GRAY}用法: ${C_GREEN}cc config init${C_RESET} — 生成默认配置文件${C_RESET}"
+                    ;;
+            esac
+            ;;
+
         # 恢复官方
         official)
             _cc_vendor_official
@@ -140,7 +154,7 @@ cc() {
 
         *)
             echo "${C_RED}✗ 未知子命令: ${sub}${C_RESET}" >&2
-            echo "${C_DARK_GRAY}可用: vendor, model, ds|glm|claude|gpt, official, update, help${C_RESET}"
+            echo "${C_DARK_GRAY}可用: config, vendor, model, ds|glm|claude|gpt, official, update, help${C_RESET}"
             return 1
             ;;
     esac
