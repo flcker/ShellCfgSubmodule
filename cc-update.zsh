@@ -231,19 +231,34 @@ cc-update() {
             _remove_version "$2"
             return $?
             ;;
-        --clean)
+        --clean|-c)
             _clean_versions
             return $?
             ;;
+        --latest|-L)
+            local platform
+            platform=$(_detect_platform) || return 1
+            echo "${C_DARK_GRAY}正在获取最新版本...${C_RESET}"
+            local latest
+            latest=$(_fetch_latest_version) || return 1
+            echo "${C_GREEN}最新版本: ${C_CYAN}${latest}${C_RESET}"
+            return 0
+            ;;
         --help|-h)
-            echo "用法: cc-update [版本号|--rollback|--remove|--clean|--list|--help]"
+            echo "用法: ${C_GREEN}cc-update${C_RESET} [版本号|--latest|-L|--rollback|-r|--remove|-rm|--clean|-c|--list|-l]"
             echo ""
-            echo "  cc-update               更新到最新版本"
-            echo "  cc-update 2.1.173       更新到指定版本"
-            echo "  cc-update --rollback    回退到上一版本"
-            echo "  cc-update --remove <ver> 删除指定版本"
-            echo "  cc-update --clean        清理所有旧版本（保留当前）"
-            echo "  cc-update --list         列出已安装版本"
+            echo "  ${C_DARK_GRAY}# 更新${C_RESET}"
+            echo "    ${C_GREEN}cc-update${C_RESET}               更新到最新版本"
+            echo "    ${C_GREEN}cc-update 2.1.173${C_RESET}       更新到指定版本"
+            echo ""
+            echo "  ${C_DARK_GRAY}# 查询${C_RESET}"
+            echo "    ${C_GREEN}--latest|-L${C_RESET}             查看最新版本号"
+            echo "    ${C_GREEN}--list|-l${C_RESET}              列出已安装版本"
+            echo ""
+            echo "  ${C_DARK_GRAY}# 管理${C_RESET}"
+            echo "    ${C_GREEN}--rollback|-r${C_RESET}          回退到上一版本"
+            echo "    ${C_GREEN}--remove|-rm <ver>${C_RESET}     删除指定版本"
+            echo "    ${C_GREEN}--clean|-c${C_RESET}             清理旧版本（保留当前）"
             return 0
             ;;
     esac
@@ -304,4 +319,4 @@ cc-update() {
 # 启动提示
 # ============================================================
 
-echo "${C_DARK_GRAY}[cc-update] 已加载，可用: ${C_GREEN}cc-update [版本|--rollback|--remove|--clean|--list]${C_RESET}"
+echo "${C_DARK_GRAY}[cc-update] 已加载，可用: ${C_GREEN}cc-update [版本|--latest|-L|--rollback|-r|--remove|-rm|--clean|-c|--list|-l]${C_RESET}"
