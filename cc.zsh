@@ -62,35 +62,11 @@ cc() {
     local sub="${1:-}"
 
     case "$sub" in
-        # 快捷全栈（v2: vendor + model / v1: 老函数兼容）
-        ds|deepseek)
-            if [[ -n "$CC_VENDOR_DS_KEY" ]]; then
-                _cc_vendor_switch ds
-            else
-                switch-deepseek
-            fi
-            ;;
-        glm)
-            if [[ -n "$CC_VENDOR_GLM_KEY" ]]; then
-                _cc_vendor_switch glm
-            else
-                switch-glm
-            fi
-            ;;
-        claude)
-            if [[ -n "$CC_VENDOR_CLAUDE_KEY" ]]; then
-                _cc_vendor_switch claude
-            else
-                switch-claude
-            fi
-            ;;
-        gpt)
-            if [[ -n "$CC_VENDOR_GPT_KEY" ]]; then
-                _cc_vendor_switch gpt
-            else
-                switch-gpt
-            fi
-            ;;
+        # 快捷全栈
+        ds|deepseek) _cc_vendor_switch ds ;;
+        glm)         _cc_vendor_switch glm ;;
+        claude)      _cc_vendor_switch claude ;;
+        gpt)         _cc_vendor_switch gpt ;;
 
         # 厂商
         vendor)

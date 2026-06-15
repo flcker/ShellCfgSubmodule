@@ -98,6 +98,8 @@ _cc_config_init() {
 #            单模型厂商可省略此行，使用内置默认
 #            多模型厂商（TAL/火山等）必填
 #
+# preset.<name>.opus/sonnet/haiku = 自定义模型预设（可选）
+#   cc model <name> 查找顺序：内置 > 配置文件 preset
 # auto = 启动时自动切换的厂商（可选）
 # ============================================================
 
@@ -130,6 +132,15 @@ _cc_config_init() {
 #vendor.xxx.url=https://your-api.example.com
 #vendor.xxx.key=sk-...
 #vendor.xxx.models=opus-model,sonnet-model,haiku-model
+
+# --- 自定义预设（cc model <name> 使用）---
+#preset.default.opus=deepseek-v4-pro
+#preset.default.sonnet=deepseek-v4-pro
+#preset.default.haiku=deepseek-v4-flash
+
+#preset.cheap.opus=deepseek-v4-flash
+#preset.cheap.sonnet=deepseek-v4-flash
+#preset.cheap.haiku=deepseek-v4-flash
 
 #auto=tal
 CONFEOF

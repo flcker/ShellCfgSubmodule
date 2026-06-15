@@ -71,13 +71,7 @@ cc gpt             厂商 + 全栈 GPT
 cc official        恢复 Anthropic 官方默认
 ```
 
-快捷命令优先使用 `CC_VENDOR_*` 新配置，若无则回退到旧 `CC_MODEL_API_KEY`。
-
-也可直接使用别名（zsh / PowerShell 均可用）：
-
-```
-cc2ds  cc2glm  cc2claude  cc2gpt  cc2official  ccmodel
-```
+`cc model <name>` 查找顺序：内置预设 → 配置文件 `preset.<name>.opus/sonnet/haiku`。
 
 ### 版本管理
 
@@ -99,22 +93,23 @@ cc help    显示完整帮助
 
 ## 环境变量
 
-### v2 厂商配置
+### 厂商配置
 
 | 变量 | 说明 | 必需 |
 |------|------|------|
-| `CC_VENDOR_<NAME>_URL` | API 地址 | 否（默认官方） |
-| `CC_VENDOR_<NAME>_KEY` | API 密钥 | 是 |
-| `CC_VENDOR_<NAME>_MODELS` | 默认模型 "opus sonnet haiku" | 单模型厂商可省略 |
+| `vendor.<name>.url` | API 地址 | 否（默认官方） |
+| `vendor.<name>.key` | API 密钥 | 是 |
+| `vendor.<name>.models` | 默认模型，逗号分隔 | 单模型厂商可省略 |
 
-`<NAME>` 支持：`DS` `GLM` `CLAUDE` `GPT` `TAL` `VOLC` 等自定义。
-
-### v1 兼容
+### 自定义预设
 
 | 变量 | 说明 |
 |------|------|
-| `CC_MODEL_API_KEY` | API 密钥（v2 配置后忽略） |
-| `CC_MODEL_BASE_URL` | 代理地址（v2 配置后忽略） |
+| `preset.<name>.opus` | Opus 模型 |
+| `preset.<name>.sonnet` | Sonnet 模型 |
+| `preset.<name>.haiku` | Haiku 模型 |
+
+`cc model <name>` 查找顺序：内置 > 配置文件 preset.
 
 ## 文件结构
 
