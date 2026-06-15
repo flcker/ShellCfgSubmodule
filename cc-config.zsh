@@ -79,9 +79,9 @@ _cc_config_init() {
     local file="$CC_CONFIG_FILE"
 
     if [[ -f "$file" ]]; then
-        echo "${C_YELLOW}配置文件已存在: ${file}${C_RESET}"
-        echo "${C_DARK_GRAY}  如需覆盖请先删除或指定 CC_CONFIG_FILE 为新路径${C_RESET}"
-        return 1
+        local bak="${file}.bak"
+        cp "$file" "$bak"
+        echo "${C_YELLOW}已备份: ${bak}${C_RESET}"
     fi
 
     mkdir -p "$(dirname "$file")"
