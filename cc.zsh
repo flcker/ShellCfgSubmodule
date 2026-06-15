@@ -2,6 +2,7 @@
 # Claude Code 统一入口（TAL Token Plan）
 # ============================================================
 # 使用方法: source ~/.config/zsh/submodule/cc-tools/cc.zsh
+#          . ~/.config/zsh/submodule/cc-tools/cc.ps1    # PowerShell
 #
 #   cc                    显示当前状态
 #   cc ds|deepseek        切换到 DeepSeek 系列
@@ -9,9 +10,12 @@
 #   cc claude             切换到 Claude 官方系列
 #   cc gpt                切换到 GPT 系列
 #   cc official           恢复 Claude 官方默认
-#   cc update [ver]       更新 Claude Code 二进制
-#   cc update --rollback  回退到上一版本
-#   cc update --list      列出已安装版本
+#   cc update [ver]       更新 Claude Code CLI
+#   cc update --latest|-L 查看最新版本号
+#   cc update --rollback|-r 回退到上一版本
+#   cc update --remove|-rm <ver> 删除指定版本
+#   cc update --clean|-c  清理旧版本（保留当前）
+#   cc update --list|-l   列出已安装版本
 #   cc help               显示帮助
 # ============================================================
 
