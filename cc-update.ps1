@@ -24,7 +24,7 @@ if (-not (Test-Path Env:CC_DIST_BASE)) {
 }
 $script:CC_VERSIONS_DIR = "$HOME/.local/share/claude/versions"
 $script:CC_BIN_DIR       = "$HOME/.local/bin"
-$script:CC_BIN_NAME      = "claude"
+$script:CC_BIN_NAME      = if ($IsWindows) { "claude.exe" } else { "claude" }
 
 # ============================================================
 # ANSI 颜色（如果尚未定义）
@@ -43,16 +43,40 @@ if (-not (Test-Path Variable:script:C_DARK_GRAY)) {
 # 平台检测
 # ============================================================
 
+function Get-Arch {
+    # 返回统一架构名：arm64 / x64
+    $procArch = if ($PSVersionTable.PSVersion.Major -ge 6) {
+        [System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture
+    } else {
+        $Env:PROCESSOR_ARCHITECTURE
+    }
+    switch ($procArch) {
+        "Arm64"  { return "arm64" }
+        "X64"    { return "x64" }
+        "AMD64"  { return "x64" }
+        "x86_64" { return "x64" }
+        "aarch64"{ return "arm64" }
+        default {
+            # 回退到 uname（macOS/Linux）
+            $uname = try { uname -m 2>$null } catch { "" }
+            if ($uname -match "arm64|aarch64") { return "arm64" }
+            if ($uname -match "x86_64")         { return "x64" }
+            Write-Host "${C_RED}✗ 不支持的架构: ${procArch}${C_RESET}" >&2
+            return $null
+        }
+    }
+}
+
 function Get-CCPlatform {
-    $os = if ($IsMacOS) { "darwin" }
-          elseif ($IsLinux) { "linux" }
-          else { Write-Host "${C_RED}✗ 不支持的操作系统${C_RESET}" >&2; return $null }
+    $arch = Get-Arch
+    if (-not $arch) { return $null }
 
-    $arch = if ($Env:PROCESSOR_ARCHITECTURE -eq "ARM64" -or (uname -m) -match "arm64|aarch64") { "arm64" }
-            elseif ((uname -m) -match "x86_64") { "x64" }
-            else { Write-Host "${C_RED}✗ 不支持的架构: $(uname -m)${C_RESET}" >&2; return $null }
+    if ($IsMacOS)    { return "darwin-${arch}" }
+    if ($IsLinux)    { return "linux-${arch}" }
+    if ($IsWindows)  { return "win32-${arch}" }
 
-    return "${os}-${arch}"
+    Write-Host "${C_RED}✗ 不支持的操作系统${C_RESET}" >&2
+    return $null
 }
 
 # ============================================================
@@ -78,6 +102,27 @@ function Get-LatestVersion {
 function Get-DownloadUrl {
     param([string]$Version, [string]$Platform)
     return "$env:CC_DIST_BASE/claude-code-releases/${Version}/${Platform}/claude"
+}
+
+# ============================================================
+# 跨平台链接（Windows 非管理员回退：符号链接 → 硬链接 → 复制）
+# ============================================================
+
+function Set-CCLink {
+    param([string]$Path, [string]$Target)
+    try {
+        New-Item -ItemType SymbolicLink -Path $Path -Target $Target -Force -ErrorAction Stop | Out-Null
+    } catch {
+        if ($IsWindows) {
+            try {
+                New-Item -ItemType HardLink -Path $Path -Target $Target -Force -ErrorAction Stop | Out-Null
+            } catch {
+                Copy-Item -Force $Target $Path
+            }
+        } else {
+            throw
+        }
+    }
 }
 
 # ============================================================
@@ -153,7 +198,7 @@ function Invoke-Rollback {
     $currentName = if ($currentTarget) { Split-Path -Leaf $currentTarget } else { "(无)" }
 
     Write-Host "${C_DARK_GRAY}回退: ${currentName} → ${C_CYAN}${targetName}${C_RESET}"
-    New-Item -ItemType SymbolicLink -Path $binPath -Target $target.Path -Force | Out-Null
+    Set-CCLink -Path $binPath -Target $target.Path
     Write-Host "${C_GREEN}✓ 已切换到 ${targetName}${C_RESET}"
     return $true
 }
@@ -321,17 +366,25 @@ function Invoke-CCUpdate {
         }
 
         # ----- 校验（检查是否为有效二进制）-----
-        # macOS: /usr/bin/file, Linux: file
-        $fileCmd = if ($IsMacOS) { "/usr/bin/file" } else { "file" }
-        $fileResult = & $fileCmd $targetPath 2>$null
-        if ($fileResult -notmatch "executable|Mach-O|ELF") {
-            Write-Host "${C_RED}✗ 下载的文件不是有效二进制${C_RESET}" >&2
-            Remove-Item -Force $targetPath -ErrorAction SilentlyContinue
-            return
+        if ($IsWindows) {
+            # Windows: 检查文件大小 > 0 且扩展名为 .exe
+            if ((Get-Item $targetPath).Length -eq 0 -or $targetPath -notmatch '\.exe$') {
+                Write-Host "${C_RED}✗ 下载的文件不是有效二进制${C_RESET}" >&2
+                Remove-Item -Force $targetPath -ErrorAction SilentlyContinue
+                return
+            }
+        } else {
+            # macOS: /usr/bin/file, Linux: file
+            $fileCmd = if ($IsMacOS) { "/usr/bin/file" } else { "file" }
+            $fileResult = & $fileCmd $targetPath 2>$null
+            if ($fileResult -notmatch "executable|Mach-O|ELF") {
+                Write-Host "${C_RED}✗ 下载的文件不是有效二进制${C_RESET}" >&2
+                Remove-Item -Force $targetPath -ErrorAction SilentlyContinue
+                return
+            }
+            # 确保可执行
+            & /bin/chmod +x $targetPath 2>$null
         }
-
-        # 确保可执行
-        & /bin/chmod +x $targetPath 2>$null
 
         Write-Host "${C_GREEN}✓ 下载完成 (${targetPath})${C_RESET}"
     }
@@ -341,8 +394,8 @@ function Invoke-CCUpdate {
     $prevTarget = ""
     try { $prevTarget = (Get-Item $binPath -ErrorAction Stop).Target } catch {}
 
-    # ----- 创建/更新 symlink -----
-    New-Item -ItemType SymbolicLink -Path $binPath -Target $targetPath -Force | Out-Null
+    # ----- 创建/更新链接 -----
+    Set-CCLink -Path $binPath -Target $targetPath
 
     if ($prevTarget -and $prevTarget -ne $targetPath) {
         Write-Host "${C_DARK_GRAY}切换: $(Split-Path -Leaf $prevTarget) → ${C_CYAN}claude-${ver}${C_RESET}"
