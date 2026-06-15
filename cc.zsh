@@ -102,7 +102,7 @@ cc() {
             if [[ -z "${1:-}" ]]; then
                 _cc_model_display
             elif [[ -n "${3:-}" ]]; then
-                _cc_model_apply "$1" "$2" "$3"
+                _cc_model_apply "$1" "$2" "$3" "${4:-}"
                 echo "${C_GREEN}✓ 模型: ${C_CYAN}${1} ${2} ${3}${C_RESET}"
             elif [[ -n "${2:-}" ]]; then
                 echo "${C_RED}✗ 用法: cc model <name> 或 cc model <opus> <sonnet> <haiku>${C_RESET}" >&2
