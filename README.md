@@ -4,36 +4,37 @@ Claude Code 统一入口 — 模型切换 & 版本管理。
 
 ## 安装
 
-**zsh**：在 `~/.zshrc` 末尾添加：
+**1. 创建配置文件** `~/.config/cc/vendors.conf`：
+
+```ini
+# 厂商配置
+vendor.tal.url=http://ai-service.tal.com/coding
+vendor.tal.key=sk-...
+vendor.tal.models=claude-opus-4.8,deepseek-v4-pro,deepseek-v4-flash
+
+vendor.ds.url=https://api.deepseek.com
+vendor.ds.key=sk-...
+
+vendor.glm.url=https://open.bigmodel.cn/api/paas/v4
+vendor.glm.key=sk-...
+
+auto=tal
+```
+
+```bash
+chmod 600 ~/.config/cc/vendors.conf
+```
+
+**2. 载入脚本**（`~/.zshrc` 末尾）：
 
 ```zsh
-# 厂商凭证（v2 推荐）
-export CC_VENDOR_DS_URL="https://api.deepseek.com"
-export CC_VENDOR_DS_KEY="sk-..."
-export CC_VENDOR_TAL_URL="http://tal-coding.com"
-export CC_VENDOR_TAL_KEY="sk-..."
-export CC_VENDOR_TAL_MODELS="claude-opus-4.8 deepseek-v4-pro deepseek-v4-flash"
-
-# 或 v1 兼容配置
-# export CC_MODEL_API_KEY="sk-..."
-# export CC_MODEL_BASE_URL="http://..."
-
-# 载入 cc-tools
 source ~/.config/zsh/submodule/cc-tools/cc.zsh
 ```
 
-**PowerShell**：在 `$PROFILE` 末尾添加：
+**PowerShell**（`$PROFILE` 末尾）：
 
 ```powershell
-# 厂商凭证
-$env:CC_VENDOR_DS_URL = "https://api.deepseek.com"
-$env:CC_VENDOR_DS_KEY = "sk-..."
-
-# macOS / Linux — 与 zsh 共用同一仓库
 . ~/.config/zsh/submodule/cc-tools/cc.ps1
-
-# Windows — 独立 pwsh 仓库
-# . ~/.config/pwsh/submodule/cc-tools/cc.ps1
 ```
 
 ## 用法
@@ -120,6 +121,7 @@ cc help    显示完整帮助
 ```
 cc-tools/
 ├── cc.zsh                    zsh 入口
+├── cc-config.zsh             zsh 配置文件加载
 ├── cc-model-switch.zsh       zsh 模型预设 + v1 切换
 ├── cc-vendor-switch.zsh      zsh 厂商管理 (v2)
 ├── cc-update.zsh             zsh 版本管理
@@ -127,6 +129,9 @@ cc-tools/
 ├── cc-model-switch.ps1       PowerShell 模型切换
 ├── cc-update.ps1             PowerShell 版本管理
 └── README.md
+
+~/.config/cc/
+└── vendors.conf              厂商配置文件（key=value，models 逗号分隔）
 ```
 
 ## 平台支持
@@ -201,6 +206,7 @@ cc model                  → 显示当前状态
 
 - [x] `cc-vendor-switch.zsh` — 独立模块，管理厂商凭证（URL/Key）
 - [x] 重构 `cc-model-switch.zsh` — 内置模型预设表，model 独立于 vendor
-- [x] `cc.zsh` 入口 — 新子命令 `vendor` / `model`，旧快捷兼容
-- [ ] `cc-vendor-switch.ps1` + 重构 `cc-model-switch.ps1` + `cc.ps1`
+- [x] `cc-config.zsh` — key=value 配置文件加载，models 逗号分隔
+- [x] `cc.zsh` 入口 — vendor / model 子命令，config 自动加载 + auto 启动切换
+- [ ] `cc-config.ps1` + `cc-vendor-switch.ps1` + 重构 `cc-model-switch.ps1` + `cc.ps1`
 - [ ] README 更新为最终版

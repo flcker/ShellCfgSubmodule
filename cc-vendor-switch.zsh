@@ -69,8 +69,9 @@ _cc_vendor_switch() {
 
     # ----- 应用模型 -----
     if [[ -n "$models" ]]; then
-        _cc_model_apply $=models
-        echo "${C_GREEN}✓ 厂商: ${C_CYAN}${name}${C_GREEN} | 模型: ${models}${C_RESET}"
+        # 逗号 → 空格（配置文件格式兼容）
+        _cc_model_apply ${(s:,:)models}
+        echo "${C_GREEN}✓ 厂商: ${C_CYAN}${name}${C_GREEN} | 模型: ${models//,/ }${C_RESET}"
     elif _cc_model_builtin "$name" >/dev/null 2>&1; then
         _cc_model_apply $(_cc_model_builtin "$name")
         echo "${C_GREEN}✓ 厂商: ${C_CYAN}${name}${C_GREEN} | 模型: ${name}${C_RESET}"

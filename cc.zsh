@@ -14,9 +14,15 @@
 
 # ----- 载入子模块 -------------------------------------------------
 _CC_DIR="${0:A:h}"
+source "${_CC_DIR}/cc-config.zsh"
 source "${_CC_DIR}/cc-model-switch.zsh"
 source "${_CC_DIR}/cc-vendor-switch.zsh"
 source "${_CC_DIR}/cc-update.zsh"
+
+# 启动自动切换（配置文件 auto 字段）
+if [[ -n "$CC_AUTO" ]]; then
+    _cc_vendor_switch "$CC_AUTO"
+fi
 
 # ----- 帮助 ------------------------------------------------------
 
