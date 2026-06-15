@@ -61,7 +61,7 @@ function Get-Arch {
             $uname = try { uname -m 2>$null } catch { "" }
             if ($uname -match "arm64|aarch64") { return "arm64" }
             if ($uname -match "x86_64")         { return "x64" }
-            Write-Host "${C_RED}✗ 不支持的架构: ${procArch}${C_RESET}" >&2
+            Write-Host "${C_RED}✗ 不支持的架构: ${procArch}${C_RESET}"
             return $null
         }
     }
@@ -75,7 +75,7 @@ function Get-CCPlatform {
     if ($IsLinux)    { return "linux-${arch}" }
     if ($IsWindows)  { return "win32-${arch}" }
 
-    Write-Host "${C_RED}✗ 不支持的操作系统${C_RESET}" >&2
+    Write-Host "${C_RED}✗ 不支持的操作系统${C_RESET}"
     return $null
 }
 
@@ -90,7 +90,7 @@ function Get-LatestVersion {
         if (-not $version) { throw "empty response" }
         return $version.Trim()
     } catch {
-        Write-Host "${C_RED}✗ 无法获取最新版本号${C_RESET}" >&2
+        Write-Host "${C_RED}✗ 无法获取最新版本号${C_RESET}"
         return $null
     }
 }
@@ -101,7 +101,7 @@ function Get-LatestVersion {
 
 function Get-DownloadUrl {
     param([string]$Version, [string]$Platform)
-    return "$env:CC_DIST_BASE/claude-code-releases/${Version}/${Platform}/claude"
+    return "$env:CC_DIST_BASE/claude-code-releases/${Version}/${Platform}/${CC_BIN_NAME}"
 }
 
 # ============================================================
@@ -110,6 +110,8 @@ function Get-DownloadUrl {
 
 function Set-CCLink {
     param([string]$Path, [string]$Target)
+    # Windows 允许删除运行中的 exe（标记为待删除，进程退出后释放），先删再建避免占用冲突
+    Remove-Item -Force $Path -ErrorAction SilentlyContinue
     try {
         New-Item -ItemType SymbolicLink -Path $Path -Target $Target -Force -ErrorAction Stop | Out-Null
     } catch {
@@ -204,14 +206,41 @@ function Invoke-Rollback {
 }
 
 # ============================================================
+# 跨平台文件同一性检测（覆盖符号链接、硬链接、复制）
+# ============================================================
+
+function Test-SameFile {
+    param([string]$Path1, [string]$Path2)
+    if (-not (Test-Path $Path1) -or -not (Test-Path $Path2)) { return $false }
+
+    $item1 = Get-Item $Path1 -Force
+    $item2 = Get-Item $Path2 -Force
+
+    # 解析符号链接 / junction
+    $real1 = if ($item1.Target) { $item1.Target } else { $item1.FullName }
+    $real2 = if ($item2.Target) { $item2.Target } else { $item2.FullName }
+    if ($real1 -eq $real2) { return $true }
+
+    # 硬链接检测：同一文件共享所有属性；复制品的 CreationTime 不同
+    try {
+        $stat1 = Get-Item $real1
+        $stat2 = Get-Item $real2
+        if ($stat1.Length -eq $stat2.Length -and
+            $stat1.CreationTimeUtc -eq $stat2.CreationTimeUtc -and
+            $stat1.LastWriteTimeUtc -eq $stat2.LastWriteTimeUtc) {
+            return $true
+        }
+    } catch {}
+    return $false
+}
+
+# ============================================================
 # 删除指定版本
 # ============================================================
 
 function Remove-Version {
     param([string]$Ver)
     $binPath = Join-Path $CC_BIN_DIR $CC_BIN_NAME
-    $currentTarget = ""
-    try { $currentTarget = (Get-Item $binPath -ErrorAction Stop).Target } catch {}
 
     # 解析文件名：支持 claude-2.1.121 和 2.1.121 两种写法
     $targetPath = $null
@@ -220,15 +249,36 @@ function Remove-Version {
     if (Test-Path $path1 -PathType Leaf) { $targetPath = $path1 }
     elseif (Test-Path $path2 -PathType Leaf) { $targetPath = $path2 }
     else {
-        Write-Host "${C_RED}✗ 版本不存在: ${Ver}${C_RESET}" >&2
+        Write-Host "${C_RED}✗ 版本不存在: ${Ver}${C_RESET}"
         return $false
     }
 
-    # 禁止删除当前使用的版本
-    if ($targetPath -eq $currentTarget) {
-        Write-Host "${C_RED}✗ 不能删除当前正在使用的版本 ($(Split-Path -Leaf $targetPath))${C_RESET}" >&2
-        Write-Host "${C_DARK_GRAY}  请先切换到其他版本后再删除${C_RESET}"
-        return $false
+    # 判断是否为当前使用的版本（覆盖符号链接、硬链接、复制）
+    $isCurrent = $false
+    try {
+        $isCurrent = Test-SameFile -Path1 $targetPath -Path2 $binPath
+    } catch {}
+
+    if ($isCurrent) {
+        # 查找其他已安装版本用于回退
+        $versions = @(Get-ChildItem $CC_VERSIONS_DIR -File | Where-Object { $_.FullName -ne $targetPath })
+        if ($versions.Count -gt 0) {
+            Write-Host "${C_YELLOW}⚠ ${Ver} 是当前版本，正在回退...${C_RESET}"
+            $rollbackTarget = $versions | ForEach-Object {
+                $v = $_.Name -replace '^claude-', ''
+                [PSCustomObject]@{ Version = $v; Path = $_.FullName }
+            } | Sort-Object {
+                $parts = $_.Version -split '\.'
+                [long]$parts[0] * 1000000 + [long]$parts[1] * 1000 + [long]$parts[2]
+            } -Descending | Select-Object -First 1
+
+            Set-CCLink -Path $binPath -Target $rollbackTarget.Path
+            Write-Host "${C_GREEN}✓ 已回退到 $(Split-Path -Leaf $rollbackTarget.Path)${C_RESET}"
+        } else {
+            Write-Host "${C_YELLOW}⚠ ${Ver} 是唯一安装的版本，一并移除 bin${C_RESET}"
+            Remove-Item -Force $binPath -ErrorAction SilentlyContinue
+            Write-Host "${C_DARK_GRAY}  已删除 $(Split-Path -Leaf $binPath)${C_RESET}"
+        }
     }
 
     Remove-Item -Force $targetPath
@@ -351,6 +401,15 @@ function Invoke-CCUpdate {
     $targetPath = Join-Path $CC_VERSIONS_DIR "claude-${ver}"
     $downloadUrl = Get-DownloadUrl -Version $ver -Platform $platform
 
+    # ----- 已是最新？-----
+    $binPath = Join-Path $CC_BIN_DIR $CC_BIN_NAME
+    if ((Test-Path $binPath) -and (Test-Path $targetPath -PathType Leaf)) {
+        if (Test-SameFile -Path1 $targetPath -Path2 $binPath) {
+            Write-Host "${C_GREEN}✓ 已是最新版本 ${C_CYAN}${ver}${C_RESET}"
+            return
+        }
+    }
+
     # ----- 版本已存在？-----
     if (Test-Path $targetPath -PathType Leaf) {
         Write-Host "${C_DARK_GRAY}版本 ${C_CYAN}${ver}${C_DARK_GRAY} 已下载，直接切换...${C_RESET}"
@@ -360,25 +419,32 @@ function Invoke-CCUpdate {
         try {
             Invoke-WebRequest -Uri $downloadUrl -OutFile $targetPath -ErrorAction Stop
         } catch {
-            Write-Host "${C_RED}✗ 下载失败${C_RESET}" >&2
+            Write-Host "${C_RED}✗ 下载失败${C_RESET}"
             Remove-Item -Force $targetPath -ErrorAction SilentlyContinue
             return
         }
 
         # ----- 校验（检查是否为有效二进制）-----
         if ($IsWindows) {
-            # Windows: 检查文件大小 > 0 且扩展名为 .exe
-            if ((Get-Item $targetPath).Length -eq 0 -or $targetPath -notmatch '\.exe$') {
-                Write-Host "${C_RED}✗ 下载的文件不是有效二进制${C_RESET}" >&2
+            # Windows: 检查 PE 魔数 (MZ)
+            $size = (Get-Item $targetPath).Length
+            if ($size -eq 0) {
+                Write-Host "${C_RED}✗ 下载的文件为空${C_RESET}"
+                Remove-Item -Force $targetPath -ErrorAction SilentlyContinue
+                return
+            }
+            $magic = [System.IO.File]::ReadAllBytes($targetPath)[0..1]
+            if ($magic[0] -ne 0x4D -or $magic[1] -ne 0x5A) {
+                Write-Host "${C_RED}✗ 下载的文件不是有效 PE 二进制${C_RESET}"
                 Remove-Item -Force $targetPath -ErrorAction SilentlyContinue
                 return
             }
         } else {
-            # macOS: /usr/bin/file, Linux: file
+            # macOS/Linux: file 命令检查
             $fileCmd = if ($IsMacOS) { "/usr/bin/file" } else { "file" }
             $fileResult = & $fileCmd $targetPath 2>$null
             if ($fileResult -notmatch "executable|Mach-O|ELF") {
-                Write-Host "${C_RED}✗ 下载的文件不是有效二进制${C_RESET}" >&2
+                Write-Host "${C_RED}✗ 下载的文件不是有效二进制${C_RESET}"
                 Remove-Item -Force $targetPath -ErrorAction SilentlyContinue
                 return
             }
@@ -386,11 +452,20 @@ function Invoke-CCUpdate {
             & /bin/chmod +x $targetPath 2>$null
         }
 
+        # ----- 完整性检查（试运行 --version）-----
+        try {
+            $null = & $targetPath --version 2>$null
+            if ($LASTEXITCODE -ne 0) { throw "exit code $LASTEXITCODE" }
+        } catch {
+            Write-Host "${C_RED}✗ 下载的文件无法运行（可能损坏或不完整）${C_RESET}"
+            Remove-Item -Force $targetPath -ErrorAction SilentlyContinue
+            return
+        }
+
         Write-Host "${C_GREEN}✓ 下载完成 (${targetPath})${C_RESET}"
     }
 
     # ----- 记录当前版本（用于回退）-----
-    $binPath = Join-Path $CC_BIN_DIR $CC_BIN_NAME
     $prevTarget = ""
     try { $prevTarget = (Get-Item $binPath -ErrorAction Stop).Target } catch {}
 

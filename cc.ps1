@@ -71,7 +71,7 @@ function Invoke-CCUpdateCommand {
                 if ($i + 1 -lt $CmdArgs.Count) {
                     $params['Remove'] = $CmdArgs[++$i]
                 } else {
-                    Write-Host "${C_RED}✗ 用法: cc update --remove <版本号>${C_RESET}" >&2
+                    Write-Host "${C_RED}✗ 用法: cc update --remove <版本号>${C_RESET}"
                     return
                 }
             }
@@ -118,7 +118,7 @@ function cc {
         'model'    { Show-CCModel }
 
         # 更新
-        'update'   { Invoke-CCUpdateCommand -Args $Rest }
+        'update'   { Invoke-CCUpdateCommand -CmdArgs $Rest }
 
         # 帮助
         { $_ -in @('help', '-h', '--help') } { Show-CCHelp }
@@ -127,7 +127,7 @@ function cc {
         ''         { Show-CCModel }
 
         default {
-            Write-Host "${C_RED}✗ 未知子命令: ${Sub}${C_RESET}" >&2
+            Write-Host "${C_RED}✗ 未知子命令: ${Sub}${C_RESET}"
             Write-Host "${C_DARK_GRAY}可用: ds|deepseek, glm, claude, gpt, official, model, update, help${C_RESET}"
         }
     }
