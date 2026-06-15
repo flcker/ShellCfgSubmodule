@@ -2,26 +2,20 @@
 # Claude Code 统一入口（TAL Token Plan）
 # ============================================================
 # 使用方法: source ~/.config/zsh/submodule/cc-tools/cc.zsh
-#          . ~/.config/zsh/submodule/cc-tools/cc.ps1    # PowerShell
 #
 #   cc                    显示当前状态
-#   cc ds|deepseek        切换到 DeepSeek 系列
-#   cc glm                切换到 GLM 系列
-#   cc claude             切换到 Claude 官方系列
-#   cc gpt                切换到 GPT 系列
-#   cc official           恢复 Claude 官方默认
-#   cc update [ver]       更新 Claude Code CLI
-#   cc update --latest|-L 查看最新版本号
-#   cc update --rollback|-r 回退到上一版本
-#   cc update --remove|-rm <ver> 删除指定版本
-#   cc update --clean|-c  清理旧版本（保留当前）
-#   cc update --list|-l   列出已安装版本
+#   cc vendor [name]      切换厂商 / 列出厂商
+#   cc preset [name|o s h] 切换模型预设 / 显示当前
+#   cc ds|glm|claude|gpt  快捷全栈切换
+#   cc official           恢复官方默认
+#   cc update ...         版本管理
 #   cc help               显示帮助
 # ============================================================
 
 # ----- 载入子模块 -------------------------------------------------
 _CC_DIR="${0:A:h}"
 source "${_CC_DIR}/cc-model-switch.zsh"
+source "${_CC_DIR}/cc-vendor-switch.zsh"
 source "${_CC_DIR}/cc-update.zsh"
 
 # ----- 帮助 ------------------------------------------------------
@@ -30,19 +24,27 @@ _cc_help() {
     echo "${C_DARK_GRAY}══ ${C_GREEN}cc${C_RESET} — Claude Code 统一入口 ${C_DARK_GRAY}══${C_RESET}"
     echo ""
     echo "  ${C_DARK_GRAY}状态${C_RESET}"
-    echo "    ${C_GREEN}cc${C_RESET}          显示当前状态"
-    echo "    ${C_GREEN}cc model${C_RESET}    显示当前模型配置"
+    echo "    ${C_GREEN}cc${C_RESET}          显示当前厂商 + 模型 + API"
+    echo "    ${C_GREEN}cc model${C_RESET}    同上"
     echo ""
-    echo "  ${C_DARK_GRAY}模型切换${C_RESET}"
-    echo "    ${C_GREEN}cc ds|deepseek${C_RESET} 切换到 DeepSeek"
-    echo "    ${C_GREEN}cc glm${C_RESET}         切换到 GLM"
-    echo "    ${C_GREEN}cc claude${C_RESET}      切换到 Claude"
-    echo "    ${C_GREEN}cc gpt${C_RESET}         切换到 GPT"
-    echo "    ${C_GREEN}cc official${C_RESET}    恢复官方默认"
+    echo "  ${C_DARK_GRAY}厂商${C_RESET}"
+    echo "    ${C_GREEN}cc vendor${C_RESET}           列出已配置厂商"
+    echo "    ${C_GREEN}cc vendor <name>${C_RESET}    切换厂商（自动应用默认模型）"
+    echo ""
+    echo "  ${C_DARK_GRAY}预设${C_RESET}"
+    echo "    ${C_GREEN}cc preset${C_RESET}               显示当前模型组合"
+    echo "    ${C_GREEN}cc preset ds|glm|claude|gpt${C_RESET} 快捷预设"
+    echo "    ${C_GREEN}cc preset <o> <s> <h>${C_RESET}       分别指定 Opus/Sonnet/Haiku"
+    echo ""
+    echo "  ${C_DARK_GRAY}快捷${C_RESET}"
+    echo "    ${C_GREEN}cc ds|deepseek${C_RESET}  厂商 + 全栈 DeepSeek"
+    echo "    ${C_GREEN}cc glm${C_RESET}          厂商 + 全栈 GLM"
+    echo "    ${C_GREEN}cc claude${C_RESET}       厂商 + 全栈 Claude"
+    echo "    ${C_GREEN}cc gpt${C_RESET}          厂商 + 全栈 GPT"
+    echo "    ${C_GREEN}cc official${C_RESET}     恢复官方 Anthropic"
     echo ""
     echo "  ${C_DARK_GRAY}更新管理${C_RESET}"
     echo "    ${C_GREEN}cc update${C_RESET}                  更新到最新版本"
-    echo "    ${C_GREEN}cc update <ver>${C_RESET}            更新到指定版本"
     echo "    ${C_GREEN}cc update --latest|-L${C_RESET}      查看最新版本号"
     echo "    ${C_GREEN}cc update --rollback|-r${C_RESET}    回退到上一版本"
     echo "    ${C_GREEN}cc update --remove|-rm <ver>${C_RESET} 删除指定版本"
@@ -56,26 +58,71 @@ cc() {
     local sub="${1:-}"
 
     case "$sub" in
-        # 模型切换
+        # 快捷全栈（v2: vendor + preset / v1: 老函数兼容）
         ds|deepseek)
-            switch-deepseek
+            if [[ -n "$CC_VENDOR_DS_KEY" ]]; then
+                _cc_vendor_switch ds
+            else
+                switch-deepseek
+            fi
             ;;
         glm)
-            switch-glm
+            if [[ -n "$CC_VENDOR_GLM_KEY" ]]; then
+                _cc_vendor_switch glm
+            else
+                switch-glm
+            fi
             ;;
         claude)
-            switch-claude
+            if [[ -n "$CC_VENDOR_CLAUDE_KEY" ]]; then
+                _cc_vendor_switch claude
+            else
+                switch-claude
+            fi
             ;;
         gpt)
-            switch-gpt
+            if [[ -n "$CC_VENDOR_GPT_KEY" ]]; then
+                _cc_vendor_switch gpt
+            else
+                switch-gpt
+            fi
             ;;
+
+        # 厂商
+        vendor)
+            shift
+            if [[ -z "${1:-}" ]]; then
+                _cc_vendor_list
+            else
+                _cc_vendor_switch "$1"
+            fi
+            ;;
+
+        # 预设
+        preset)
+            shift
+            if [[ -z "${1:-}" ]]; then
+                _cc_preset_display
+            elif [[ -n "${3:-}" ]]; then
+                # 三参数：opus sonnet haiku
+                _cc_preset_apply "$1" "$2" "$3"
+                echo "${C_GREEN}✓ 预设: ${C_CYAN}${1} ${2} ${3}${C_RESET}"
+            elif [[ -n "${2:-}" ]]; then
+                echo "${C_RED}✗ 用法: cc preset <name> 或 cc preset <opus> <sonnet> <haiku>${C_RESET}" >&2
+                return 1
+            else
+                _cc_preset_switch "$1"
+            fi
+            ;;
+
+        # 恢复官方
         official)
-            restore-claude-official
+            _cc_vendor_official
             ;;
 
         # 状态
         model)
-            show-current-model
+            _cc_preset_display
             ;;
 
         # 更新
@@ -91,12 +138,12 @@ cc() {
 
         # 默认显示状态
         "")
-            show-current-model
+            _cc_preset_display
             ;;
 
         *)
             echo "${C_RED}✗ 未知子命令: ${sub}${C_RESET}" >&2
-            echo "${C_DARK_GRAY}可用: ds|deepseek, glm, claude, gpt, official, model, update, help${C_RESET}"
+            echo "${C_DARK_GRAY}可用: vendor, preset, ds|glm|claude|gpt, official, model, update, help${C_RESET}"
             return 1
             ;;
     esac

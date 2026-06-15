@@ -162,16 +162,79 @@ alias cc2official='restore-claude-official'
 alias ccmodel='show-current-model'
 
 # ============================================================
-# 启动提示 & 默认切换到 DeepSeek
+# 模型预设系统 (v2)
+# ============================================================
+
+# 内置预设 → "opus sonnet haiku" 字符串
+_cc_preset_builtin() {
+    case "$1" in
+        ds|deepseek) echo "deepseek-v4-pro deepseek-v4-pro deepseek-v4-flash" ;;
+        glm)         echo "glm-5.1 glm-5.1 glm-4.7" ;;
+        claude)      echo "claude-opus-4.8 claude-sonnet-4.6 claude-haiku-4.5" ;;
+        gpt)         echo "gpt-5.3-codex gpt-5.3-codex gpt-5.2-codex" ;;
+        *)           return 1 ;;
+    esac
+}
+
+# 应用模型组合 opus sonnet haiku
+_cc_preset_apply() {
+    local opus="$1" sonnet="$2" haiku="$3"
+    export ANTHROPIC_MODEL="$opus"
+    export ANTHROPIC_DEFAULT_OPUS_MODEL="$opus"
+    export ANTHROPIC_DEFAULT_SONNET_MODEL="$sonnet"
+    export ANTHROPIC_DEFAULT_HAIKU_MODEL="$haiku"
+
+    # Effort: Claude 官方模型不启用
+    if [[ "$opus" == claude-opus-* ]]; then
+        unset CLAUDE_CODE_EFFORT_LEVEL
+        unset CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING
+    else
+        export CLAUDE_CODE_EFFORT_LEVEL="max"
+        export CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING="1"
+    fi
+}
+
+# 按名称切换预设
+_cc_preset_switch() {
+    local name="$1"
+    local models
+    models=$(_cc_preset_builtin "$name") || {
+        echo "${C_RED}✗ 未知预设: ${name}${C_RESET}" >&2
+        echo "${C_DARK_GRAY}可用: ds|deepseek, glm, claude, gpt${C_RESET}"
+        return 1
+    }
+    _cc_preset_apply $=models
+    echo "${C_GREEN}✓ 预设: ${C_CYAN}${name}${C_RESET}"
+}
+
+# 显示当前模型（增强版，含厂商）
+_cc_preset_display() {
+    local opus="${ANTHROPIC_DEFAULT_OPUS_MODEL:-claude-opus (官方)}"
+    local sonnet="${ANTHROPIC_DEFAULT_SONNET_MODEL:-claude-sonnet (官方)}"
+    local haiku="${ANTHROPIC_DEFAULT_HAIKU_MODEL:-claude-haiku (官方)}"
+
+    if [[ -n "$CC_CURRENT_VENDOR" ]]; then
+        echo "${C_DARK_GRAY}[Vendor]: ${C_CYAN}${CC_CURRENT_VENDOR}${C_RESET}"
+    fi
+    echo "${C_DARK_GRAY}[Opus]:   ${C_CYAN}${opus}${C_DARK_GRAY}\t [Sonnet]: ${C_CYAN}${sonnet}${C_DARK_GRAY}\t [Haiku]:  ${C_CYAN}${haiku}${C_RESET}"
+    local url="${ANTHROPIC_BASE_URL:-https://api.anthropic.com}"
+    echo "${C_DARK_GRAY}[API]:    ${url}${C_RESET}"
+}
+
+# ============================================================
+# 启动提示 & 自动切换
 # ============================================================
 
 echo "${C_DARK_GRAY}[cc-tools] 已加载，可用: ${C_GREEN}cc2ds / cc2glm / cc2claude / cc2gpt / cc2official / ccmodel${C_RESET}"
 
-if [[ -n "$CC_MODEL_API_KEY" ]]; then
+# 优先级: CC_VENDOR_*_KEY > CC_MODEL_API_KEY
+if [[ -n "$CC_VENDOR_DS_KEY" ]] || [[ -n "$CC_VENDOR_GLM_KEY" ]] || \
+   [[ -n "$CC_VENDOR_CLAUDE_KEY" ]] || [[ -n "$CC_VENDOR_GPT_KEY" ]] || \
+   [[ -n "$CC_VENDOR_TAL_KEY" ]] || [[ -n "$CC_VENDOR_VOLC_KEY" ]]; then
+    echo "${C_DARK_GRAY}[cc-tools] 检测到 CC_VENDOR_* 配置，使用 cc vendor <name> 切换${C_RESET}"
+elif [[ -n "$CC_MODEL_API_KEY" ]]; then
     switch-deepseek
 else
-    echo "${C_YELLOW}⚠ 未配置 CC_MODEL_API_KEY，跳过自动切换${C_RESET}"
-    echo "${C_DARK_GRAY}  请在 ~/.zshrc 中添加:${C_RESET}"
-    echo "${C_DARK_GRAY}    export CC_MODEL_API_KEY=\"sk-...\"${C_RESET}"
-    echo "${C_DARK_GRAY}    export CC_MODEL_BASE_URL=\"http://...\"  # 可选${C_RESET}"
+    echo "${C_YELLOW}⚠ 未配置凭证，跳过自动切换${C_RESET}"
+    echo "${C_DARK_GRAY}  请在 ~/.zshrc 中配置 CC_VENDOR_*_KEY 或 CC_MODEL_API_KEY${C_RESET}"
 fi

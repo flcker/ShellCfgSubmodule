@@ -7,9 +7,16 @@ Claude Code 统一入口 — 模型切换 & 版本管理。
 **zsh**：在 `~/.zshrc` 末尾添加：
 
 ```zsh
-# 凭证配置
-export CC_MODEL_API_KEY="sk-..."        # API 密钥（必需）
-export CC_MODEL_BASE_URL="http://..."   # 代理地址（可选，默认走官方）
+# 厂商凭证（v2 推荐）
+export CC_VENDOR_DS_URL="https://api.deepseek.com"
+export CC_VENDOR_DS_KEY="sk-..."
+export CC_VENDOR_TAL_URL="http://tal-coding.com"
+export CC_VENDOR_TAL_KEY="sk-..."
+export CC_VENDOR_TAL_MODELS="claude-opus-4.8 deepseek-v4-pro deepseek-v4-flash"
+
+# 或 v1 兼容配置
+# export CC_MODEL_API_KEY="sk-..."
+# export CC_MODEL_BASE_URL="http://..."
 
 # 载入 cc-tools
 source ~/.config/zsh/submodule/cc-tools/cc.zsh
@@ -18,9 +25,9 @@ source ~/.config/zsh/submodule/cc-tools/cc.zsh
 **PowerShell**：在 `$PROFILE` 末尾添加：
 
 ```powershell
-# 凭证配置
-$env:CC_MODEL_API_KEY = "sk-..."        # API 密钥（必需）
-$env:CC_MODEL_BASE_URL = "http://..."   # 代理地址（可选，默认走官方）
+# 厂商凭证
+$env:CC_VENDOR_DS_URL = "https://api.deepseek.com"
+$env:CC_VENDOR_DS_KEY = "sk-..."
 
 # macOS / Linux — 与 zsh 共用同一仓库
 . ~/.config/zsh/submodule/cc-tools/cc.ps1
@@ -34,19 +41,36 @@ $env:CC_MODEL_BASE_URL = "http://..."   # 代理地址（可选，默认走官�
 ### 状态
 
 ```
-cc          显示当前模型配置和 API 端点
-cc model    同上（显式）
+cc          显示当前厂商 + 模型 + API
+cc model    同上
 ```
 
-### 模型切换
+### 厂商
 
 ```
-cc ds|deepseek     DeepSeek:  deepseek-v4-pro / deepseek-v4-flash
-cc glm             GLM:       glm-5.1 / glm-4.7
-cc claude          Claude:    claude-opus-4.8 / claude-sonnet-4.6 / claude-haiku-4.5
-cc gpt             GPT:       gpt-5.3-codex / gpt-5.2-codex
+cc vendor           列出已配置厂商
+cc vendor <name>    切换厂商
+```
+
+### 预设
+
+```
+cc preset                    显示当前模型组合
+cc preset ds|glm|claude|gpt  快捷全栈
+cc preset <opus> <sonnet> <haiku>  分别指定三档
+```
+
+### 快捷
+
+```
+cc ds|deepseek     厂商 + 全栈 DeepSeek
+cc glm             厂商 + 全栈 GLM
+cc claude          厂商 + 全栈 Claude
+cc gpt             厂商 + 全栈 GPT
 cc official        恢复 Anthropic 官方默认
 ```
+
+快捷命令优先使用 `CC_VENDOR_*` 新配置，若无则回退到旧 `CC_MODEL_API_KEY`。
 
 也可直接使用别名（zsh / PowerShell 均可用）：
 
@@ -74,19 +98,30 @@ cc help    显示完整帮助
 
 ## 环境变量
 
+### v2 厂商配置
+
 | 变量 | 说明 | 必需 |
 |------|------|------|
-| `CC_MODEL_API_KEY` | API 密钥 | 是 |
-| `CC_MODEL_BASE_URL` | 代理地址（默认走官方 api.anthropic.com） | 否 |
-| `CC_MODEL_DISABLE_EXPERIMENTAL_BETAS` | 禁用实验特性（默认 1） | 否 |
-| `CC_MODEL_ATTRIBUTION_HEADER` | 归属头（默认 false） | 否 |
+| `CC_VENDOR_<NAME>_URL` | API 地址 | 否（默认官方） |
+| `CC_VENDOR_<NAME>_KEY` | API 密钥 | 是 |
+| `CC_VENDOR_<NAME>_MODELS` | 默认模型 "opus sonnet haiku" | 单模型厂商可省略 |
+
+`<NAME>` 支持：`DS` `GLM` `CLAUDE` `GPT` `TAL` `VOLC` 等自定义。
+
+### v1 兼容
+
+| 变量 | 说明 |
+|------|------|
+| `CC_MODEL_API_KEY` | API 密钥（v2 配置后忽略） |
+| `CC_MODEL_BASE_URL` | 代理地址（v2 配置后忽略） |
 
 ## 文件结构
 
 ```
 cc-tools/
 ├── cc.zsh                    zsh 入口
-├── cc-model-switch.zsh       zsh 模型切换
+├── cc-model-switch.zsh       zsh 模型预设 + v1 切换
+├── cc-vendor-switch.zsh      zsh 厂商管理 (v2)
 ├── cc-update.zsh             zsh 版本管理
 ├── cc.ps1                    PowerShell 入口
 ├── cc-model-switch.ps1       PowerShell 模型切换
@@ -164,8 +199,8 @@ cc model                  → 显示当前状态
 
 #### 任务拆解
 
-- [ ] `cc-vendor-switch` — 独立模块，管理厂商凭证（URL/Key）
-- [ ] 重构 `cc-model-switch` — 内置模型预设表，preset 独立于 vendor
-- [ ] 修改 `cc` 入口 — 新子命令 `vendor` / `preset`，旧快捷兼容
-- [ ] zsh + PowerShell 同步实现
+- [x] `cc-vendor-switch.zsh` — 独立模块，管理厂商凭证（URL/Key）
+- [x] 重构 `cc-model-switch.zsh` — 内置模型预设表，preset 独立于 vendor
+- [x] `cc.zsh` 入口 — 新子命令 `vendor` / `preset`，旧快捷兼容
+- [ ] `cc-vendor-switch.ps1` + 重构 `cc-model-switch.ps1` + `cc.ps1`
 - [ ] README 更新为最终版
