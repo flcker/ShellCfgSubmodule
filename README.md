@@ -52,12 +52,12 @@ cc vendor           列出已配置厂商
 cc vendor <name>    切换厂商
 ```
 
-### 预设
+### 模型
 
 ```
-cc preset                    显示当前模型组合
-cc preset ds|glm|claude|gpt  快捷全栈
-cc preset <opus> <sonnet> <haiku>  分别指定三档
+cc model                    显示当前模型组合
+cc model ds|glm|claude|gpt  快捷全栈
+cc model <opus> <sonnet> <haiku>  分别指定三档
 ```
 
 ### 快捷
@@ -169,13 +169,13 @@ cc vendor               显示当前厂商
 cc vendor tal|ds|glm|...
 
 # 模型组合（切三档模型）
-cc preset                    显示当前组合
-cc preset ds|glm|claude|gpt  快捷全栈
-cc preset <opus> <sonnet> <haiku>  分别指定
+cc model                    显示当前组合
+cc model ds|glm|claude|gpt  快捷全栈
+cc model <opus> <sonnet> <haiku>  分别指定
 
 # 快捷（厂商 + 模型一起切，保持 v1 兼容）
-cc ds|glm|claude|gpt     → vendor + preset 全栈
-cc tal|volc               → vendor + 默认 preset
+cc ds|glm|claude|gpt     → vendor + model 全栈
+cc tal|volc               → vendor + 默认 model
 cc official               → 恢复官方
 cc model                  → 显示当前状态
 ```
@@ -184,9 +184,9 @@ cc model                  → 显示当前状态
 
 | 命令 | 单模型厂商 (DS/GLM/Claude/GPT) | 多模型厂商 (TAL/火山) |
 |------|-------------------------------|----------------------|
-| `cc <name>` | 厂商 + 模型全栈定死 | 只切入口，模型由 `cc preset` 控制 |
+| `cc <name>` | 厂商 + 模型全栈定死 | 只切入口，模型由 `cc model` 控制 |
 | `cc vendor <name>` | 同上 | 只切入口 |
-| `cc preset <o> <s> <h>` | 覆盖默认（一般不必要） | 分配三档 |
+| `cc model <o> <s> <h>` | 覆盖默认（一般不必要） | 分配三档 |
 
 **内置模型默认**：
 
@@ -200,7 +200,7 @@ cc model                  → 显示当前状态
 #### 任务拆解
 
 - [x] `cc-vendor-switch.zsh` — 独立模块，管理厂商凭证（URL/Key）
-- [x] 重构 `cc-model-switch.zsh` — 内置模型预设表，preset 独立于 vendor
-- [x] `cc.zsh` 入口 — 新子命令 `vendor` / `preset`，旧快捷兼容
+- [x] 重构 `cc-model-switch.zsh` — 内置模型预设表，model 独立于 vendor
+- [x] `cc.zsh` 入口 — 新子命令 `vendor` / `model`，旧快捷兼容
 - [ ] `cc-vendor-switch.ps1` + 重构 `cc-model-switch.ps1` + `cc.ps1`
 - [ ] README 更新为最终版

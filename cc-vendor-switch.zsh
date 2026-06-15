@@ -69,15 +69,15 @@ _cc_vendor_switch() {
 
     # ----- 应用模型 -----
     if [[ -n "$models" ]]; then
-        _cc_preset_apply $=models
+        _cc_model_apply $=models
         echo "${C_GREEN}✓ 厂商: ${C_CYAN}${name}${C_GREEN} | 模型: ${models}${C_RESET}"
-    elif _cc_preset_builtin "$name" >/dev/null 2>&1; then
-        _cc_preset_apply $(_cc_preset_builtin "$name")
-        echo "${C_GREEN}✓ 厂商: ${C_CYAN}${name}${C_GREEN} | 预设: ${name}${C_RESET}"
+    elif _cc_model_builtin "$name" >/dev/null 2>&1; then
+        _cc_model_apply $(_cc_model_builtin "$name")
+        echo "${C_GREEN}✓ 厂商: ${C_CYAN}${name}${C_GREEN} | 模型: ${name}${C_RESET}"
     else
         # 多模型厂商无 _MODELS 配置 → 仅切凭证，模型不变
         echo "${C_GREEN}✓ 厂商: ${C_CYAN}${name}${C_RESET}"
-        echo "${C_DARK_GRAY}  模型未变（多模型厂商请用 cc preset 指定组合）${C_RESET}"
+        echo "${C_DARK_GRAY}  模型未变（多模型厂商请用 cc model 指定组合）${C_RESET}"
     fi
 }
 

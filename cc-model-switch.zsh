@@ -166,7 +166,7 @@ alias ccmodel='show-current-model'
 # ============================================================
 
 # 内置预设 → "opus sonnet haiku" 字符串
-_cc_preset_builtin() {
+_cc_model_builtin() {
     case "$1" in
         ds|deepseek) echo "deepseek-v4-pro deepseek-v4-pro deepseek-v4-flash" ;;
         glm)         echo "glm-5.1 glm-5.1 glm-4.7" ;;
@@ -177,7 +177,7 @@ _cc_preset_builtin() {
 }
 
 # 应用模型组合 opus sonnet haiku
-_cc_preset_apply() {
+_cc_model_apply() {
     local opus="$1" sonnet="$2" haiku="$3"
     export ANTHROPIC_MODEL="$opus"
     export ANTHROPIC_DEFAULT_OPUS_MODEL="$opus"
@@ -195,20 +195,20 @@ _cc_preset_apply() {
 }
 
 # 按名称切换预设
-_cc_preset_switch() {
+_cc_model_switch() {
     local name="$1"
     local models
-    models=$(_cc_preset_builtin "$name") || {
-        echo "${C_RED}✗ 未知预设: ${name}${C_RESET}" >&2
+    models=$(_cc_model_builtin "$name") || {
+        echo "${C_RED}✗ 未知模型: ${name}${C_RESET}" >&2
         echo "${C_DARK_GRAY}可用: ds|deepseek, glm, claude, gpt${C_RESET}"
         return 1
     }
-    _cc_preset_apply $=models
-    echo "${C_GREEN}✓ 预设: ${C_CYAN}${name}${C_RESET}"
+    _cc_model_apply $=models
+    echo "${C_GREEN}✓ 模型: ${C_CYAN}${name}${C_RESET}"
 }
 
 # 显示当前模型（增强版，含厂商）
-_cc_preset_display() {
+_cc_model_display() {
     local opus="${ANTHROPIC_DEFAULT_OPUS_MODEL:-claude-opus (官方)}"
     local sonnet="${ANTHROPIC_DEFAULT_SONNET_MODEL:-claude-sonnet (官方)}"
     local haiku="${ANTHROPIC_DEFAULT_HAIKU_MODEL:-claude-haiku (官方)}"

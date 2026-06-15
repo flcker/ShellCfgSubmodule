@@ -5,7 +5,7 @@
 #
 #   cc                    显示当前状态
 #   cc vendor [name]      切换厂商 / 列出厂商
-#   cc preset [name|o s h] 切换模型预设 / 显示当前
+#   cc model [name|o s h] 切换模型 / 显示当前
 #   cc ds|glm|claude|gpt  快捷全栈切换
 #   cc official           恢复官方默认
 #   cc update ...         版本管理
@@ -23,18 +23,15 @@ source "${_CC_DIR}/cc-update.zsh"
 _cc_help() {
     echo "${C_DARK_GRAY}══ ${C_GREEN}cc${C_RESET} — Claude Code 统一入口 ${C_DARK_GRAY}══${C_RESET}"
     echo ""
-    echo "  ${C_DARK_GRAY}状态${C_RESET}"
-    echo "    ${C_GREEN}cc${C_RESET}          显示当前厂商 + 模型 + API"
-    echo "    ${C_GREEN}cc model${C_RESET}    同上"
-    echo ""
     echo "  ${C_DARK_GRAY}厂商${C_RESET}"
     echo "    ${C_GREEN}cc vendor${C_RESET}           列出已配置厂商"
     echo "    ${C_GREEN}cc vendor <name>${C_RESET}    切换厂商（自动应用默认模型）"
     echo ""
-    echo "  ${C_DARK_GRAY}预设${C_RESET}"
-    echo "    ${C_GREEN}cc preset${C_RESET}               显示当前模型组合"
-    echo "    ${C_GREEN}cc preset ds|glm|claude|gpt${C_RESET} 快捷预设"
-    echo "    ${C_GREEN}cc preset <o> <s> <h>${C_RESET}       分别指定 Opus/Sonnet/Haiku"
+    echo "  ${C_DARK_GRAY}模型${C_RESET}"
+    echo "    ${C_GREEN}cc${C_RESET}                 显示当前厂商 + 模型 + API"
+    echo "    ${C_GREEN}cc model${C_RESET}             同上（显式）"
+    echo "    ${C_GREEN}cc model ds|glm|claude|gpt${C_RESET} 快捷切换"
+    echo "    ${C_GREEN}cc model <o> <s> <h>${C_RESET}       分别指定 Opus/Sonnet/Haiku"
     echo ""
     echo "  ${C_DARK_GRAY}快捷${C_RESET}"
     echo "    ${C_GREEN}cc ds|deepseek${C_RESET}  厂商 + 全栈 DeepSeek"
@@ -58,7 +55,7 @@ cc() {
     local sub="${1:-}"
 
     case "$sub" in
-        # 快捷全栈（v2: vendor + preset / v1: 老函数兼容）
+        # 快捷全栈（v2: vendor + model / v1: 老函数兼容）
         ds|deepseek)
             if [[ -n "$CC_VENDOR_DS_KEY" ]]; then
                 _cc_vendor_switch ds
@@ -98,31 +95,25 @@ cc() {
             fi
             ;;
 
-        # 预设
-        preset)
-            shift
-            if [[ -z "${1:-}" ]]; then
-                _cc_preset_display
-            elif [[ -n "${3:-}" ]]; then
-                # 三参数：opus sonnet haiku
-                _cc_preset_apply "$1" "$2" "$3"
-                echo "${C_GREEN}✓ 预设: ${C_CYAN}${1} ${2} ${3}${C_RESET}"
-            elif [[ -n "${2:-}" ]]; then
-                echo "${C_RED}✗ 用法: cc preset <name> 或 cc preset <opus> <sonnet> <haiku>${C_RESET}" >&2
-                return 1
-            else
-                _cc_preset_switch "$1"
-            fi
-            ;;
-
         # 恢复官方
         official)
             _cc_vendor_official
             ;;
 
-        # 状态
+        # 模型
         model)
-            _cc_preset_display
+            shift
+            if [[ -z "${1:-}" ]]; then
+                _cc_model_display
+            elif [[ -n "${3:-}" ]]; then
+                _cc_model_apply "$1" "$2" "$3"
+                echo "${C_GREEN}✓ 模型: ${C_CYAN}${1} ${2} ${3}${C_RESET}"
+            elif [[ -n "${2:-}" ]]; then
+                echo "${C_RED}✗ 用法: cc model <name> 或 cc model <opus> <sonnet> <haiku>${C_RESET}" >&2
+                return 1
+            else
+                _cc_model_switch "$1"
+            fi
             ;;
 
         # 更新
@@ -138,12 +129,12 @@ cc() {
 
         # 默认显示状态
         "")
-            _cc_preset_display
+            _cc_model_display
             ;;
 
         *)
             echo "${C_RED}✗ 未知子命令: ${sub}${C_RESET}" >&2
-            echo "${C_DARK_GRAY}可用: vendor, preset, ds|glm|claude|gpt, official, model, update, help${C_RESET}"
+            echo "${C_DARK_GRAY}可用: vendor, model, ds|glm|claude|gpt, official, update, help${C_RESET}"
             return 1
             ;;
     esac
