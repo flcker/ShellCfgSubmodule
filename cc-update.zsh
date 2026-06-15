@@ -163,11 +163,34 @@ _remove_version() {
         return 1
     fi
 
-    # 禁止删除当前使用的版本
+    # 判断是否为当前使用的版本
     if [[ "$target_path" == "$current_target" ]]; then
-        echo "${C_RED}✗ 不能删除当前正在使用的版本 ($(basename "$target_path"))${C_RESET}" >&2
-        echo "${C_DARK_GRAY}  请先切换到其他版本后再删除${C_RESET}"
-        return 1
+        # 查找其他已安装版本用于回退
+        local candidates=()
+        for f in "$CC_VERSIONS_DIR"/*; do
+            [[ -f "$f" ]] || continue
+            [[ "$f" != "$target_path" ]] && candidates+=("$f")
+        done
+
+        if [[ ${#candidates[@]} -gt 0 ]]; then
+            echo "${C_YELLOW}⚠ ${ver} 是当前版本，正在回退...${C_RESET}"
+            # 按版本号降序取第一个
+            local rollback_target rollback_name
+            rollback_target=$(
+                for f in "${candidates[@]}"; do
+                    local bn="$(basename "$f")"
+                    local v="${bn#claude-}"
+                    printf '%s\t%s\n' "$v" "$f"
+                done | sort -Vr | head -1 | cut -f2
+            )
+            rollback_name="$(basename "$rollback_target")"
+            ln -sf "$rollback_target" "${CC_BIN_DIR}/${CC_BIN_NAME}"
+            echo "${C_GREEN}✓ 已回退到 ${rollback_name}${C_RESET}"
+        else
+            echo "${C_YELLOW}⚠ ${ver} 是唯一安装的版本，一并移除 bin${C_RESET}"
+            rm -f "${CC_BIN_DIR}/${CC_BIN_NAME}"
+            echo "${C_DARK_GRAY}  已删除 ${CC_BIN_NAME}${C_RESET}"
+        fi
     fi
 
     rm -f "$target_path"
@@ -278,6 +301,14 @@ cc-update() {
     local download_url
     download_url=$(_build_download_url "$version" "$platform")
 
+    # ----- 已是最新？-----
+    local current_target
+    current_target=$(readlink "${CC_BIN_DIR}/${CC_BIN_NAME}" 2>/dev/null || echo "")
+    if [[ -f "$target_path" ]] && [[ "$target_path" == "$current_target" ]]; then
+        echo "${C_GREEN}✓ 已是最新版本 ${C_CYAN}${version}${C_RESET}"
+        return 0
+    fi
+
     # ----- 版本已存在？-----
     if [[ -f "$target_path" ]]; then
         echo "${C_DARK_GRAY}版本 ${C_CYAN}${version}${C_DARK_GRAY} 已下载，直接切换...${C_RESET}"
@@ -299,18 +330,21 @@ cc-update() {
             return 1
         fi
 
+        # ----- 完整性检查（试运行 --version）-----
+        if ! "$target_path" --version >/dev/null 2>&1; then
+            echo "${C_RED}✗ 下载的文件无法运行（可能损坏或不完整）${C_RESET}" >&2
+            rm -f "$target_path"
+            return 1
+        fi
+
         echo "${C_GREEN}✓ 下载完成 (${target_path})${C_RESET}"
     fi
-
-    # ----- 记录当前版本（用于回退）-----
-    local prev_target
-    prev_target=$(readlink "${CC_BIN_DIR}/${CC_BIN_NAME}" 2>/dev/null || echo "")
 
     # ----- 创建/更新 symlink -----
     ln -sf "$target_path" "${CC_BIN_DIR}/${CC_BIN_NAME}"
 
-    if [[ -n "$prev_target" ]] && [[ "$prev_target" != "$target_path" ]]; then
-        echo "${C_DARK_GRAY}切换: $(basename "$prev_target") → ${C_CYAN}claude-${version}${C_RESET}"
+    if [[ -n "$current_target" ]] && [[ "$current_target" != "$target_path" ]]; then
+        echo "${C_DARK_GRAY}切换: $(basename "$current_target") → ${C_CYAN}claude-${version}${C_RESET}"
     fi
     echo "${C_GREEN}✓ Claude Code ${version} (${platform}) 已就绪${C_RESET}"
 }
