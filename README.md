@@ -22,8 +22,11 @@ source ~/.config/zsh/submodule/cc-tools/cc.zsh
 $env:CC_MODEL_API_KEY = "sk-..."        # API 密钥（必需）
 $env:CC_MODEL_BASE_URL = "http://..."   # 代理地址（可选，默认走官方）
 
-# 载入 cc-tools
+# macOS / Linux — 与 zsh 共用同一仓库
 . ~/.config/zsh/submodule/cc-tools/cc.ps1
+
+# Windows — 独立 pwsh 仓库
+# . ~/.config/pwsh/submodule/cc-tools/cc.ps1
 ```
 
 ## 用法
