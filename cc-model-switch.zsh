@@ -35,14 +35,14 @@ _cc_model_builtin() {
 # ============================================================
 
 _cc_model_apply() {
-    local opus="$1" sonnet="$2" haiku="$3"
-    export ANTHROPIC_MODEL="$opus"
+    local opus="$1" sonnet="$2" haiku="$3" current="${4:-$1}"
+    export ANTHROPIC_MODEL="$current"
     export ANTHROPIC_DEFAULT_OPUS_MODEL="$opus"
     export ANTHROPIC_DEFAULT_SONNET_MODEL="$sonnet"
     export ANTHROPIC_DEFAULT_HAIKU_MODEL="$haiku"
 
     # Effort: Claude 官方模型不启用
-    if [[ "$opus" == claude-opus-* ]]; then
+    if [[ "$current" == claude-opus-* ]]; then
         unset CLAUDE_CODE_EFFORT_LEVEL
         unset CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING
     else
@@ -67,19 +67,25 @@ _cc_model_switch() {
         return 0
     fi
 
-    # 2. 配置文件 preset.<name>.opus/sonnet/haiku
-    local opus_key="CC_PRESET_${(U)name}_OPUS"
-    local sonnet_key="CC_PRESET_${(U)name}_SONNET"
-    local haiku_key="CC_PRESET_${(U)name}_HAIKU"
-    if [[ -n "${(P)opus_key}" ]] && [[ -n "${(P)sonnet_key}" ]] && [[ -n "${(P)haiku_key}" ]]; then
-        _cc_model_apply "${(P)opus_key}" "${(P)sonnet_key}" "${(P)haiku_key}"
-        echo "${C_GREEN}✓ 模型: ${C_CYAN}${name}${C_DARK_GRAY} (${(P)opus_key}, ${(P)sonnet_key}, ${(P)haiku_key})${C_RESET}"
-        return 0
+    # 2. 配置文件 vendor.<vendor>.preset.<name>.current/opus/sonnet/haiku
+    local vendor="${CC_CURRENT_VENDOR:-}"
+    if [[ -n "$vendor" ]]; then
+        local opus_key="CC_VENDOR_${(U)vendor}_PRESET_${(U)name}_OPUS"
+        local sonnet_key="CC_VENDOR_${(U)vendor}_PRESET_${(U)name}_SONNET"
+        local haiku_key="CC_VENDOR_${(U)vendor}_PRESET_${(U)name}_HAIKU"
+        if [[ -n "${(P)opus_key}" ]] && [[ -n "${(P)sonnet_key}" ]] && [[ -n "${(P)haiku_key}" ]]; then
+            local current_key="CC_VENDOR_${(U)vendor}_PRESET_${(U)name}_CURRENT"
+            _cc_model_apply "${(P)opus_key}" "${(P)sonnet_key}" "${(P)haiku_key}" "${(P)current_key}"
+            echo "${C_GREEN}✓ 模型: ${C_CYAN}${name}${C_DARK_GRAY} (${(P)opus_key}, ${(P)sonnet_key}, ${(P)haiku_key})${C_RESET}"
+            return 0
+        fi
     fi
 
     echo "${C_RED}✗ 未知模型: ${name}${C_RESET}" >&2
     echo "${C_DARK_GRAY}内置: ds|deepseek, glm, claude, gpt${C_RESET}"
-    echo "${C_DARK_GRAY}自定义: 在配置文件添加 preset.${name}.opus/sonnet/haiku${C_RESET}"
+    if [[ -n "$vendor" ]]; then
+        echo "${C_DARK_GRAY}自定义: 在配置文件添加 vendor.${vendor}.preset.${name}.opus/sonnet/haiku${C_RESET}"
+    fi
     return 1
 }
 
@@ -88,16 +94,18 @@ _cc_model_switch() {
 # ============================================================
 
 _cc_model_display() {
+    local current="${ANTHROPIC_MODEL:-${ANTHROPIC_DEFAULT_OPUS_MODEL:-claude-opus (官方)}}"
     local opus="${ANTHROPIC_DEFAULT_OPUS_MODEL:-claude-opus (官方)}"
     local sonnet="${ANTHROPIC_DEFAULT_SONNET_MODEL:-claude-sonnet (官方)}"
     local haiku="${ANTHROPIC_DEFAULT_HAIKU_MODEL:-claude-haiku (官方)}"
     local url="${ANTHROPIC_BASE_URL:-https://api.anthropic.com}"
 
     if [[ -n "$CC_CURRENT_VENDOR" ]]; then
-        echo "${C_DARK_GRAY}[Vendor]: ${C_CYAN}${CC_CURRENT_VENDOR}${C_RESET}"
+        echo "${C_DARK_GRAY}[Vendor]:  ${C_CYAN}${CC_CURRENT_VENDOR}${C_RESET}"
     fi
-    echo "${C_DARK_GRAY}[Opus]:   ${C_CYAN}${opus}${C_DARK_GRAY}\t [Sonnet]: ${C_CYAN}${sonnet}${C_DARK_GRAY}\t [Haiku]:  ${C_CYAN}${haiku}${C_RESET}"
-    echo "${C_DARK_GRAY}[API]:    ${url}${C_RESET}"
+    echo "${C_DARK_GRAY}[Current]: ${C_CYAN}${current}${C_RESET}"
+    echo "${C_DARK_GRAY}[Opus]:    ${C_CYAN}${opus}${C_DARK_GRAY}\t [Sonnet]: ${C_CYAN}${sonnet}${C_DARK_GRAY}\t [Haiku]:  ${C_CYAN}${haiku}${C_RESET}"
+    echo "${C_DARK_GRAY}[API]:     ${url}${C_RESET}"
 }
 
 # ============================================================
