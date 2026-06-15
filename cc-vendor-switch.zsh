@@ -31,9 +31,21 @@ _cc_vendor_list() {
     fi
     local current="${CC_CURRENT_VENDOR:-}"
     for v in "${vendors[@]}"; do
+        local upper="${(U)v}"
+        local url_var="CC_VENDOR_${upper}_URL"
+        local models_var="CC_VENDOR_${upper}_MODELS"
+        local url="${(P)url_var:-https://api.anthropic.com}"
+        local models="${(P)models_var}"
         local marker=""
         [[ "$v" == "$current" ]] && marker=" ${C_GREEN}← 当前${C_RESET}"
+
         echo "  ${C_CYAN}${v}${marker}${C_RESET}"
+        echo "    ${C_DARK_GRAY}url: ${url}${C_RESET}"
+        if [[ -n "$models" ]]; then
+            echo "    ${C_DARK_GRAY}models: ${models//,/ }${C_RESET}"
+        else
+            echo "    ${C_DARK_GRAY}models: ${v} (内置)${C_RESET}"
+        fi
     done
 }
 

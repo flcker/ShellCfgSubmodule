@@ -85,8 +85,12 @@ cc() {
                 init)
                     _cc_config_init
                     ;;
+                reload)
+                    _cc_config_reload
+                    ;;
                 *)
-                    echo "${C_DARK_GRAY}用法: ${C_GREEN}cc config init${C_RESET} — 生成默认配置文件${C_RESET}"
+                    echo "${C_DARK_GRAY}用法: ${C_GREEN}cc config init${C_RESET}    — 生成默认配置文件${C_RESET}"
+                    echo "${C_DARK_GRAY}      ${C_GREEN}cc config reload${C_RESET} — 重载配置文件${C_RESET}"
                     ;;
             esac
             ;;
