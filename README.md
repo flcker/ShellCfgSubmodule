@@ -100,3 +100,72 @@ cc-tools/
 |---|:---:|:---:|:---:|
 | zsh | ✓ | ✓ | — |
 | PowerShell | ✓ | ✓ | ✓ |
+
+## TODO
+
+### v2 — 厂商 / 模型组合分层切换
+
+当前 `cc ds|glm|claude|gpt` 一把切换厂商+模型，无法跨厂商混用（如 TAL 入口 + Claude Opus + DeepSeek Haiku）。
+
+#### 设计
+
+**配置约定**（`~/.zshrc`）：
+
+```zsh
+# 厂商凭证：CC_PROVIDER_<name>_URL / _KEY / _MODELS
+# _MODELS 格式 "opus sonnet haiku"，单模型厂商可省略（用内置默认）
+
+# 多模型厂商（_MODELS 必填）
+export CC_PROVIDER_TAL_URL="http://..."  CC_PROVIDER_TAL_KEY="sk-..."  CC_PROVIDER_TAL_MODELS="claude-opus-4.8 deepseek-v4-pro deepseek-v4-flash"
+export CC_PROVIDER_VOLC_URL="http://..." CC_PROVIDER_VOLC_KEY="sk-..." CC_PROVIDER_VOLC_MODELS="deepseek-v4-pro deepseek-v4-pro deepseek-v4-flash"
+
+# 单模型厂商（_MODELS 可选，有内置默认）
+export CC_PROVIDER_DS_URL="..."   CC_PROVIDER_DS_KEY="sk-..."
+export CC_PROVIDER_GLM_URL="..."  CC_PROVIDER_GLM_KEY="sk-..."
+export CC_PROVIDER_GPT_URL="..."  CC_PROVIDER_GPT_KEY="sk-..."
+export CC_PROVIDER_CLAUDE_KEY="sk-ant-..."                         # URL 默认 api.anthropic.com
+```
+
+**命令设计**：
+
+```
+# 厂商（切凭证入口）
+cc provider               显示当前厂商
+cc provider tal|ds|glm|...
+
+# 模型组合（切三档模型）
+cc mix                    显示当前组合
+cc mix ds|glm|claude|gpt  快捷全栈
+cc mix <opus> <sonnet> <haiku>  分别指定
+
+# 快捷（厂商 + 模型一起切，保持 v1 兼容）
+cc ds|glm|claude|gpt     → provider + mix 全栈
+cc tal|volc               → provider + 默认 mix
+cc official               → 恢复官方
+cc model                  → 显示当前状态
+```
+
+**行为区分**：
+
+| 命令 | 单模型厂商 (DS/GLM/Claude/GPT) | 多模型厂商 (TAL/火山) |
+|------|-------------------------------|----------------------|
+| `cc <name>` | 厂商 + 模型全栈定死 | 只切入口，模型由 `cc mix` 控制 |
+| `cc provider <name>` | 同上 | 只切入口 |
+| `cc mix <o> <s> <h>` | 覆盖默认（一般不必要） | 分配三档 |
+
+**内置模型默认**：
+
+| 厂商 | Opus | Sonnet | Haiku |
+|------|------|--------|-------|
+| DS | deepseek-v4-pro | deepseek-v4-pro | deepseek-v4-flash |
+| GLM | glm-5.1 | glm-5.1 | glm-4.7 |
+| Claude | claude-opus-4.8 | claude-sonnet-4.6 | claude-haiku-4.5 |
+| GPT | gpt-5.3-codex | gpt-5.3-codex | gpt-5.2-codex |
+
+#### 任务拆解
+
+- [ ] `cc-provider-switch` — 独立模块，管理厂商凭证（URL/Key）
+- [ ] 重构 `cc-model-switch` — 内置模型预设表，mix 独立于 provider
+- [ ] 修改 `cc` 入口 — 新子命令 `provider` / `mix`，旧快捷兼容
+- [ ] zsh + PowerShell 同步实现
+- [ ] README 更新为最终版
