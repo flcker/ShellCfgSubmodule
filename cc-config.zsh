@@ -77,7 +77,7 @@ _cc_config_get() {
 
 _cc_config_init() {
     local file="$CC_CONFIG_FILE"
-    local template="${_CC_DIR}/default.conf"
+    local template="${_CC_DIR}/template.conf"
 
     if [[ ! -f "$template" ]]; then
         echo "${C_RED}✗ 模板文件不存在: ${template}${C_RESET}" >&2
