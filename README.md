@@ -125,7 +125,7 @@ cc model heavy       → 在该入口下选 heavy 模型组合
 | `vendor.<name>.preset.<n>.current` | model | ANTHROPIC_MODEL（可选，缺省取 opus） |
 | `auto` | vendor name | 启动自动切换 |
 
-`models` 和 `preset` 字段用逗号分隔，对应 ANTHROPIC 三档环境变量。
+`models` 用逗号分隔三档模型。`preset` 每行为单个模型，以 `opus/sonnet/haiku/current` 后缀区分。
 
 ## 架构
 
