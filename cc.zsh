@@ -29,8 +29,11 @@ fi
 _cc_help() {
     echo "${C_DARK_GRAY}══ ${C_GREEN}cc${C_RESET} — Claude Code 统一入口 ${C_DARK_GRAY}══${C_RESET}"
     echo ""
-    echo "  ${C_DARK_GRAY}厂商${C_RESET}"
+    echo "  ${C_DARK_GRAY}配置${C_RESET}"
     echo "    ${C_GREEN}cc config init${C_RESET}       生成默认配置文件"
+    echo "    ${C_GREEN}cc config reload${C_RESET}     重载配置文件"
+    echo ""
+    echo "  ${C_DARK_GRAY}厂商${C_RESET}"
     echo "    ${C_GREEN}cc vendor${C_RESET}           列出已配置厂商"
     echo "    ${C_GREEN}cc vendor <name>${C_RESET}    切换厂商（自动应用默认模型）"
     echo ""
