@@ -57,17 +57,8 @@ _cc_model_apply() {
 
 _cc_model_switch() {
     local name="$1"
-    local models
 
-    # 1. 内置预设
-    models=$(_cc_model_builtin "$name" 2>/dev/null)
-    if [[ -n "$models" ]]; then
-        _cc_model_apply $=models
-        echo "${C_GREEN}✓ 模型: ${C_CYAN}${name}${C_RESET}"
-        return 0
-    fi
-
-    # 2. 配置文件 vendor.<vendor>.preset.<name>.current/opus/sonnet/haiku
+    # 1. 配置文件 vendor.<vendor>.preset.<name>.current/opus/sonnet/haiku
     local vendor="${CC_CURRENT_VENDOR:-}"
     if [[ -n "$vendor" ]]; then
         local opus_key="CC_VENDOR_${(U)vendor}_PRESET_${(U)name}_OPUS"
@@ -81,10 +72,19 @@ _cc_model_switch() {
         fi
     fi
 
+    # 2. 内置预设
+    local models
+    models=$(_cc_model_builtin "$name" 2>/dev/null)
+    if [[ -n "$models" ]]; then
+        _cc_model_apply $=models
+        echo "${C_GREEN}✓ 模型: ${C_CYAN}${name}${C_RESET}"
+        return 0
+    fi
+
     echo "${C_RED}✗ 未知模型: ${name}${C_RESET}" >&2
     echo "${C_DARK_GRAY}内置: ds|deepseek, glm, claude, gpt${C_RESET}"
     if [[ -n "$vendor" ]]; then
-        echo "${C_DARK_GRAY}自定义: 在配置文件添加 vendor.${vendor}.preset.${name}.opus/sonnet/haiku${C_RESET}"
+        echo "${C_DARK_GRAY}自定义: vendor.${vendor}.preset.${name}.opus/sonnet/haiku${C_RESET}"
     fi
     return 1
 }
@@ -106,6 +106,21 @@ _cc_model_display() {
     echo "${C_DARK_GRAY}[Current]: ${C_CYAN}${current}${C_RESET}"
     echo "${C_DARK_GRAY}[Opus]:    ${C_CYAN}${opus}${C_DARK_GRAY}\t [Sonnet]: ${C_CYAN}${sonnet}${C_DARK_GRAY}\t [Haiku]:  ${C_CYAN}${haiku}${C_RESET}"
     echo "${C_DARK_GRAY}[API]:     ${url}${C_RESET}"
+
+    # 列出当前厂商可用预设
+    local vendor="${CC_CURRENT_VENDOR:-}"
+    if [[ -n "$vendor" ]]; then
+        local presets=()
+        local prefix="CC_VENDOR_${(U)vendor}_PRESET_"
+        for var in ${(Mk)parameters:#${prefix}*_OPUS}; do
+            local pname="${var#$prefix}"
+            pname="${pname%_OPUS}"
+            presets+=("${(L)pname}")
+        done
+        if [[ ${#presets[@]} -gt 0 ]]; then
+            echo "${C_DARK_GRAY}[Presets]: ${C_CYAN}${(j:, :)presets}${C_RESET}"
+        fi
+    fi
 }
 
 # ============================================================
