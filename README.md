@@ -35,7 +35,7 @@ vendor.ds.url=https://api.deepseek.com
 vendor.ds.key=sk-...
 vendor.ds.models=deepseek-v4-pro,deepseek-v4-pro,deepseek-v4-flash
 
-auto=multi
+auto=multi:heavy
 ```
 
 ```bash
@@ -123,7 +123,7 @@ cc model heavy       → 在该入口下选 heavy 模型组合
 | `vendor.<name>.preset.<n>.sonnet` | model | 预设 Sonnet（必需） |
 | `vendor.<name>.preset.<n>.haiku` | model | 预设 Haiku（必需） |
 | `vendor.<name>.preset.<n>.current` | model | ANTHROPIC_MODEL（可选，缺省取 opus） |
-| `auto` | vendor name | 启动自动切换 |
+| `auto` | `vendor` 或 `vendor:preset` | 启动自动切换 |
 
 `models` 用逗号分隔三档模型。`preset` 每行为单个模型，以 `opus/sonnet/haiku/current` 后缀区分。
 
