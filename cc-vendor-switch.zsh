@@ -2,24 +2,16 @@
 # Claude Code 厂商切换脚本 (v2)
 # ============================================================
 # 管理 API 厂商凭证（URL + Key），与模型预设独立。
-#
-# 配置（~/.zshrc）：
-#   export CC_VENDOR_<NAME>_URL="http://..."    # API 地址
-#   export CC_VENDOR_<NAME>_KEY="sk-..."        # API 密钥
-#   export CC_VENDOR_<NAME>_MODELS="o s h"      # 默认模型（可选）
-#
-# 单模型厂商（DS/GLM/Claude/GPT）有内置模型默认，
-# 多模型厂商（TAL/Volc 等）需显式指定 _MODELS。
+# 全部厂商 + 模型映射在 ~/.config/cc-tools/cc-tools.conf 中配置。
 # ============================================================
 
 # ============================================================
-# 厂商列表（注册厂商名）
+# 厂商列表
 # ============================================================
 
 _cc_vendor_list() {
     local vendors=()
     local vname
-    # 扫描所有 CC_VENDOR_*_KEY 变量
     for var in ${(Mk)parameters:#CC_VENDOR_*_KEY}; do
         vname="${var#CC_VENDOR_}"
         vname="${vname%_KEY}"
@@ -29,24 +21,57 @@ _cc_vendor_list() {
         echo "${C_DARK_GRAY}(未配置任何厂商)${C_RESET}"
         return
     fi
+
     local current="${CC_CURRENT_VENDOR:-}"
-    for v in "${vendors[@]}"; do
-        local upper="${(U)v}"
+
+    # 当前厂商先展示，带预设列表
+    if [[ -n "$current" ]]; then
+        local upper="${(U)current}"
         local url_var="CC_VENDOR_${upper}_URL"
         local models_var="CC_VENDOR_${upper}_MODELS"
         local url="${(P)url_var:-https://api.anthropic.com}"
         local models="${(P)models_var}"
-        local marker=""
-        [[ "$v" == "$current" ]] && marker=" ${C_GREEN}← 当前${C_RESET}"
 
-        echo "  ${C_CYAN}${v}${marker}${C_RESET}"
-        echo "    ${C_DARK_GRAY}url: ${url}${C_RESET}"
+        echo "  ${C_CYAN}${current} ${C_GREEN}← 当前${C_RESET}"
+        echo "    ${C_DARK_GRAY}url:    ${url}${C_RESET}"
         if [[ -n "$models" ]]; then
             echo "    ${C_DARK_GRAY}models: ${models//,/ }${C_RESET}"
-        else
-            echo "    ${C_DARK_GRAY}models: ${v} (内置)${C_RESET}"
         fi
+
+        local presets=()
+        local prefix="CC_VENDOR_${upper}_PRESET_"
+        for var in ${(Mk)parameters:#${prefix}*_OPUS}; do
+            local pname="${var#$prefix}"
+            pname="${pname%_OPUS}"
+            presets+=("${(L)pname}")
+        done
+        if [[ ${#presets[@]} -gt 0 ]]; then
+            echo "    ${C_DARK_GRAY}presets:${C_CYAN} ${(j:, :)presets}${C_RESET}"
+        fi
+    fi
+
+    # 其他可用厂商
+    local others=()
+    for v in "${vendors[@]}"; do
+        [[ "$v" == "$current" ]] && continue
+        others+=("$v")
     done
+    if [[ ${#others[@]} -gt 0 ]]; then
+        echo ""
+        echo "  ${C_DARK_GRAY}可用:${C_RESET}"
+        for v in "${others[@]}"; do
+            local upper="${(U)v}"
+            local url_var="CC_VENDOR_${upper}_URL"
+            local models_var="CC_VENDOR_${upper}_MODELS"
+            local url="${(P)url_var:-https://api.anthropic.com}"
+            local models="${(P)models_var}"
+
+            echo "    ${C_CYAN}${v}${C_RESET}  ${C_DARK_GRAY}url: ${url}${C_RESET}"
+            if [[ -n "$models" ]]; then
+                echo "    ${C_DARK_GRAY}      models: ${models//,/ }${C_RESET}"
+            fi
+        done
+    fi
 }
 
 # ============================================================
@@ -81,16 +106,11 @@ _cc_vendor_switch() {
 
     # ----- 应用模型 -----
     if [[ -n "$models" ]]; then
-        # 逗号 → 空格（配置文件格式兼容）
         _cc_model_apply ${(s:,:)models}
         echo "${C_GREEN}✓ 厂商: ${C_CYAN}${name}${C_GREEN} | 模型: ${models//,/ }${C_RESET}"
-    elif _cc_model_builtin "$name" >/dev/null 2>&1; then
-        _cc_model_apply $(_cc_model_builtin "$name")
-        echo "${C_GREEN}✓ 厂商: ${C_CYAN}${name}${C_GREEN} | 模型: ${name}${C_RESET}"
     else
-        # 多模型厂商无 _MODELS 配置 → 仅切凭证，模型不变
         echo "${C_GREEN}✓ 厂商: ${C_CYAN}${name}${C_RESET}"
-        echo "${C_DARK_GRAY}  模型未变（多模型厂商请用 cc model 指定组合）${C_RESET}"
+        echo "${C_DARK_GRAY}  未配置 models，使用 cc model <name> 指定组合${C_RESET}"
     fi
 }
 

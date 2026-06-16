@@ -1,7 +1,7 @@
 # ============================================================
 # Claude Code 模型预设 (v2)
 # ============================================================
-# 内置预设 + env 操作。厂商凭证由 cc-vendor-switch 管理。
+# 预设及 env 操作。厂商凭证由 cc-vendor-switch 管理。
 # ============================================================
 
 # ============================================================
@@ -17,21 +17,7 @@ C_RED="$fg[red]"
 C_RESET="$reset_color"
 
 # ============================================================
-# 内置预设 → "opus sonnet haiku" 字符串
-# ============================================================
-
-_cc_model_builtin() {
-    case "$1" in
-        ds|deepseek) echo "deepseek-v4-pro deepseek-v4-pro deepseek-v4-flash" ;;
-        glm)         echo "glm-5.1 glm-5.1 glm-4.7" ;;
-        claude)      echo "claude-opus-4.8 claude-sonnet-4.6 claude-haiku-4.5" ;;
-        gpt)         echo "gpt-5.3-codex gpt-5.3-codex gpt-5.2-codex" ;;
-        *)           return 1 ;;
-    esac
-}
-
-# ============================================================
-# 应用模型组合 opus sonnet haiku
+# 应用模型组合 opus sonnet haiku [current]
 # ============================================================
 
 _cc_model_apply() {
@@ -41,7 +27,6 @@ _cc_model_apply() {
     export ANTHROPIC_DEFAULT_SONNET_MODEL="$sonnet"
     export ANTHROPIC_DEFAULT_HAIKU_MODEL="$haiku"
 
-    # Effort: Claude 官方模型不启用
     if [[ "$current" == claude-opus-* ]]; then
         unset CLAUDE_CODE_EFFORT_LEVEL
         unset CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING
@@ -52,40 +37,30 @@ _cc_model_apply() {
 }
 
 # ============================================================
-# 按名称切换：内置 > 配置文件 preset.<name>
+# 按名称切换预设（仅查配置）
 # ============================================================
 
 _cc_model_switch() {
     local name="$1"
-
-    # 1. 配置文件 vendor.<vendor>.preset.<name>.current/opus/sonnet/haiku
     local vendor="${CC_CURRENT_VENDOR:-}"
-    if [[ -n "$vendor" ]]; then
-        local opus_key="CC_VENDOR_${(U)vendor}_PRESET_${(U)name}_OPUS"
-        local sonnet_key="CC_VENDOR_${(U)vendor}_PRESET_${(U)name}_SONNET"
-        local haiku_key="CC_VENDOR_${(U)vendor}_PRESET_${(U)name}_HAIKU"
-        if [[ -n "${(P)opus_key}" ]] && [[ -n "${(P)sonnet_key}" ]] && [[ -n "${(P)haiku_key}" ]]; then
-            local current_key="CC_VENDOR_${(U)vendor}_PRESET_${(U)name}_CURRENT"
-            _cc_model_apply "${(P)opus_key}" "${(P)sonnet_key}" "${(P)haiku_key}" "${(P)current_key}"
-            echo "${C_GREEN}✓ 模型: ${C_CYAN}${name}${C_DARK_GRAY} (${(P)opus_key}, ${(P)sonnet_key}, ${(P)haiku_key})${C_RESET}"
-            return 0
-        fi
+
+    if [[ -z "$vendor" ]]; then
+        echo "${C_RED}✗ 未选择厂商，请先 cc vendor <name>${C_RESET}" >&2
+        return 1
     fi
 
-    # 2. 内置预设
-    local models
-    models=$(_cc_model_builtin "$name" 2>/dev/null)
-    if [[ -n "$models" ]]; then
-        _cc_model_apply $=models
-        echo "${C_GREEN}✓ 模型: ${C_CYAN}${name}${C_RESET}"
+    local opus_key="CC_VENDOR_${(U)vendor}_PRESET_${(U)name}_OPUS"
+    local sonnet_key="CC_VENDOR_${(U)vendor}_PRESET_${(U)name}_SONNET"
+    local haiku_key="CC_VENDOR_${(U)vendor}_PRESET_${(U)name}_HAIKU"
+    if [[ -n "${(P)opus_key}" ]] && [[ -n "${(P)sonnet_key}" ]] && [[ -n "${(P)haiku_key}" ]]; then
+        local current_key="CC_VENDOR_${(U)vendor}_PRESET_${(U)name}_CURRENT"
+        _cc_model_apply "${(P)opus_key}" "${(P)sonnet_key}" "${(P)haiku_key}" "${(P)current_key}"
+        echo "${C_GREEN}✓ 预设: ${C_CYAN}${name}${C_DARK_GRAY} → ${(P)opus_key}, ${(P)sonnet_key}, ${(P)haiku_key}${C_RESET}"
         return 0
     fi
 
-    echo "${C_RED}✗ 未知模型: ${name}${C_RESET}" >&2
-    echo "${C_DARK_GRAY}内置: ds|deepseek, glm, claude, gpt${C_RESET}"
-    if [[ -n "$vendor" ]]; then
-        echo "${C_DARK_GRAY}自定义: vendor.${vendor}.preset.${name}.opus/sonnet/haiku${C_RESET}"
-    fi
+    echo "${C_RED}✗ 未知预设: ${name}${C_RESET}" >&2
+    echo "${C_DARK_GRAY}  在配置文件添加: vendor.${vendor}.preset.${name}.opus/sonnet/haiku${C_RESET}"
     return 1
 }
 
@@ -107,7 +82,6 @@ _cc_model_display() {
     echo "${C_DARK_GRAY}[Opus]:    ${C_CYAN}${opus}${C_DARK_GRAY}\t [Sonnet]: ${C_CYAN}${sonnet}${C_DARK_GRAY}\t [Haiku]:  ${C_CYAN}${haiku}${C_RESET}"
     echo "${C_DARK_GRAY}[API]:     ${url}${C_RESET}"
 
-    # 列出当前厂商可用预设
     local vendor="${CC_CURRENT_VENDOR:-}"
     if [[ -n "$vendor" ]]; then
         local presets=()

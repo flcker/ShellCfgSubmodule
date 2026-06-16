@@ -35,16 +35,14 @@ _cc_help() {
     echo "    ${C_GREEN}cc vendor <name>${C_RESET}    切换厂商（自动应用默认模型）"
     echo ""
     echo "  ${C_DARK_GRAY}模型${C_RESET}"
-    echo "    ${C_GREEN}cc${C_RESET}                 显示当前模型 + 可用预设"
+    echo "    ${C_GREEN}cc${C_RESET}                 显示当前厂商 + 模型 + 预设列表"
     echo "    ${C_GREEN}cc model${C_RESET}             同上（显式）"
-    echo "    ${C_GREEN}cc model <name>${C_RESET}        切换预设（配置 > 内置）"
-    echo "    ${C_GREEN}cc model <o> <s> <h>${C_RESET}       分别指定 Opus/Sonnet/Haiku"
+    echo "    ${C_GREEN}cc model <name>${C_RESET}        切换预设"
+    echo "    ${C_GREEN}cc model <o> <s> <h>${C_RESET}       Opus/Sonnet/Haiku"
+    echo "    ${C_GREEN}cc model <o> <s> <h> <c>${C_RESET}   Opus/Sonnet/Haiku/Current"
     echo ""
     echo "  ${C_DARK_GRAY}快捷${C_RESET}"
-    echo "    ${C_GREEN}cc ds|deepseek${C_RESET}  厂商 + 全栈 DeepSeek"
-    echo "    ${C_GREEN}cc glm${C_RESET}          厂商 + 全栈 GLM"
-    echo "    ${C_GREEN}cc claude${C_RESET}       厂商 + 全栈 Claude"
-    echo "    ${C_GREEN}cc gpt${C_RESET}          厂商 + 全栈 GPT"
+    echo "    ${C_GREEN}cc <vendor>${C_RESET}     cc vendor 别名（依赖配置）"
     echo "    ${C_GREEN}cc official${C_RESET}     恢复官方 Anthropic"
     echo ""
     echo "  ${C_DARK_GRAY}更新管理${C_RESET}"
@@ -62,13 +60,7 @@ cc() {
     local sub="${1:-}"
 
     case "$sub" in
-        # 快捷全栈
-        ds|deepseek) _cc_vendor_switch ds ;;
-        glm)         _cc_vendor_switch glm ;;
-        claude)      _cc_vendor_switch claude ;;
-        gpt)         _cc_vendor_switch gpt ;;
-
-        # 厂商
+        # 厂商（也作为 cc <vendor> 快捷）
         vendor)
             shift
             if [[ -z "${1:-}" ]]; then
@@ -107,9 +99,9 @@ cc() {
                 _cc_model_display
             elif [[ -n "${3:-}" ]]; then
                 _cc_model_apply "$1" "$2" "$3" "${4:-}"
-                echo "${C_GREEN}✓ 模型: ${C_CYAN}${1} ${2} ${3}${C_RESET}"
+                echo "${C_GREEN}✓ 模型: ${C_CYAN}${1} ${2} ${3}${4:+ current=${4}}${C_RESET}"
             elif [[ -n "${2:-}" ]]; then
-                echo "${C_RED}✗ 用法: cc model <name> 或 cc model <opus> <sonnet> <haiku>${C_RESET}" >&2
+                echo "${C_RED}✗ 用法: cc model <name> 或 cc model <opus> <sonnet> <haiku> [current]${C_RESET}" >&2
                 return 1
             else
                 _cc_model_switch "$1"
@@ -133,8 +125,12 @@ cc() {
             ;;
 
         *)
-            echo "${C_RED}✗ 未知子命令: ${sub}${C_RESET}" >&2
-            echo "${C_DARK_GRAY}可用: config, vendor, model, ds|glm|claude|gpt, official, update, help${C_RESET}"
+            # 尝试作为厂商名快捷切换
+            if _cc_vendor_switch "$sub"; then
+                return 0
+            fi
+            echo "${C_DARK_GRAY}可用: config, vendor, model, official, update, help${C_RESET}"
+            echo "${C_DARK_GRAY}      cc <vendor> — 快捷切换厂商${C_RESET}"
             return 1
             ;;
     esac
