@@ -11,6 +11,9 @@ if (-not (Test-Path Variable:script:C_DARK_GRAY)) {
     $script:C_RESET     = "`e[0m"
 }
 
+# 捕获脚本目录，供函数内部使用（函数调用时 $PSScriptRoot 可能为空）
+$script:CC_CONFIG_DIR = $PSScriptRoot
+
 if (-not (Test-Path Env:CC_CONFIG_FILE)) {
     $env:CC_CONFIG_FILE = "$HOME/.config/cc-tools/cc-tools.conf"
 }
@@ -43,7 +46,7 @@ function Import-CCConfig {
 
 function Set-CCConfigInit {
     $file = $env:CC_CONFIG_FILE
-    $template = Join-Path $PSScriptRoot 'template.conf'
+    $template = Join-Path $script:CC_CONFIG_DIR 'template.conf'
     if (-not (Test-Path $template)) {
         Write-Host "${C_RED}✗ 模板文件不存在: ${template}${C_RESET}"
         return

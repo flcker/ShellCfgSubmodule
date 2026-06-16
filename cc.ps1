@@ -50,13 +50,16 @@ function Show-CCHelp {
 # 主入口
 # ============================================================
 
-function cc {
+function global:cc {
     param(
         [Parameter(Position = 0)]
         [string]$Sub,
         [Parameter(ValueFromRemainingArguments = $true)]
         [string[]]$Rest
     )
+
+    # 无剩余参数时 $Rest 为 $null，统一为空数组避免索引报错
+    if (-not $Rest) { $Rest = @() }
 
     switch ($Sub) {
         'vendor' {
