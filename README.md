@@ -7,24 +7,25 @@ Claude Code 统一入口 — 厂商切换 & 模型管理 & 版本更新。
 **1. 编写配置** `~/.config/cc-tools/cc-tools.conf`：
 
 ```ini
-# 厂商定义
-vendor.tal.url=http://ai-service.tal.com/coding
-vendor.tal.key=sk-...
-vendor.tal.models=claude-opus-4.8,deepseek-v4-pro,deepseek-v4-flash
-vendor.tal.preset.claude.current=claude-opus-4.8
-vendor.tal.preset.claude.opus=claude-opus-4.8
-vendor.tal.preset.claude.sonnet=claude-sonnet-4.6
-vendor.tal.preset.claude.haiku=claude-haiku-4.5
-vendor.tal.preset.ds.current=deepseek-v4-pro
-vendor.tal.preset.ds.opus=deepseek-v4-pro
-vendor.tal.preset.ds.sonnet=deepseek-v4-pro
-vendor.tal.preset.ds.haiku=deepseek-v4-flash
+# 多模型厂商（可混用不同厂商的模型）
+vendor.multi.url=http://your-proxy.com
+vendor.multi.key=sk-...
+vendor.multi.models=claude-opus-4.8,deepseek-v4-pro,deepseek-v4-flash
+vendor.multi.preset.heavy.current=claude-opus-4.8
+vendor.multi.preset.heavy.opus=claude-opus-4.8
+vendor.multi.preset.heavy.sonnet=claude-sonnet-4.6
+vendor.multi.preset.heavy.haiku=claude-haiku-4.5
+vendor.multi.preset.lite.current=deepseek-v4-flash
+vendor.multi.preset.lite.opus=deepseek-v4-flash
+vendor.multi.preset.lite.sonnet=deepseek-v4-flash
+vendor.multi.preset.lite.haiku=deepseek-v4-flash
 
+# 单模型厂商
 vendor.ds.url=https://api.deepseek.com
 vendor.ds.key=sk-...
 vendor.ds.models=deepseek-v4-pro,deepseek-v4-pro,deepseek-v4-flash
 
-auto=tal
+auto=multi
 ```
 
 ```bash
