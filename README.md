@@ -1,6 +1,16 @@
 # cc-tools
 
-Claude Code 统一入口 — 厂商切换 & 模型管理 & 版本更新。
+Claude Code 统一入口：厂商切换、模型管理、版本更新。配置驱动，操作不写文件。
+
+## 快速上手
+
+```bash
+cc config init              # 1. 生成配置文件模板
+vim ~/.config/cc-tools/cc-tools.conf  # 2. 编辑凭证和模型
+cc config reload            # 3. 重载（或新开 shell）
+cc vendor                   # 4. 查看当前厂商
+cc model heavy              # 5. 切换预设
+```
 
 ## 安装
 
@@ -88,6 +98,17 @@ cc update --list|-l          列出已安装版本
 ```
 cc help    显示完整帮助
 ```
+
+## 概念
+
+`Vendor` 控制 API 入口（URL + Key），`Model` 控制用哪个模型组合。
+
+```
+cc vendor multi      → 切到多模型代理入口
+cc model heavy       → 在该入口下选 heavy 模型组合
+```
+
+多模型厂商（代理平台）可混用不同厂商的模型。单模型厂商只需配置 `models`，无需 `preset`。
 
 ## 配置文件格式
 
