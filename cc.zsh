@@ -20,8 +20,12 @@ source "${_CC_DIR}/cc-vendor-switch.zsh"
 source "${_CC_DIR}/cc-update.zsh"
 
 # 启动自动切换（配置文件 auto 字段）
+# 格式: vendor 或 vendor:preset
 if [[ -n "$CC_AUTO" ]]; then
-    _cc_vendor_switch "$CC_AUTO"
+    local auto_vendor="${CC_AUTO%%:*}"
+    local auto_preset="${CC_AUTO#*:}"
+    [[ "$auto_preset" == "$auto_vendor" ]] && auto_preset=""
+    _cc_vendor_switch "$auto_vendor" && [[ -n "$auto_preset" ]] && _cc_model_switch "$auto_preset"
 fi
 
 # ----- 帮助 ------------------------------------------------------

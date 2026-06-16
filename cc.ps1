@@ -18,9 +18,12 @@ $script:_CC_DIR = Split-Path -Parent $MyInvocation.MyCommand.Path
 . (Join-Path $_CC_DIR 'cc-vendor-switch.ps1')
 . (Join-Path $_CC_DIR 'cc-update.ps1')
 
-# 启动自动切换
+# 启动自动切换（格式: vendor 或 vendor:preset）
 if ($env:CC_AUTO) {
-    Switch-CCVendor $env:CC_AUTO
+    $parts = $env:CC_AUTO -split ':', 2
+    if (Switch-CCVendor $parts[0]) {
+        if ($parts[1]) { Switch-CCModel $parts[1] }
+    }
 }
 
 # ============================================================
