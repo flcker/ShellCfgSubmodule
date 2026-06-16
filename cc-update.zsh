@@ -5,10 +5,10 @@
 #
 # 使用方法:
 #   source ~/.config/zsh/submodule/cc-tools/cc-update.zsh
-#   cc-update              # 更新到最新版本
-#   cc-update 2.1.173      # 更新到指定版本
-#   cc-update --rollback   # 回退到上一版本
-#   cc-update --list       # 列出已安装版本
+#   cc update             # 更新到最新版本
+#   cc update2.1.173      # 更新到指定版本
+#   cc update--rollback   # 回退到上一版本
+#   cc update--list       # 列出已安装版本
 #
 # 参考: claude-update.md
 # ============================================================
@@ -248,7 +248,7 @@ cc-update() {
             ;;
         --remove|-rm)
             if [[ -z "${2:-}" ]]; then
-                echo "${C_RED}✗ 用法: cc-update --remove <版本号>${C_RESET}" >&2
+                echo "${C_RED}✗ 用法: cc update --remove <版本号>${C_RESET}" >&2
                 return 1
             fi
             _remove_version "$2"
@@ -268,11 +268,11 @@ cc-update() {
             return 0
             ;;
         --help|-h)
-            echo "用法: ${C_GREEN}cc-update${C_RESET} [版本号|--latest|-L|--rollback|-r|--remove|-rm|--clean|-c|--list|-l]"
+            echo "用法: ${C_GREEN}cc update${C_RESET} [版本号|--latest|-L|--rollback|-r|--remove|-rm|--clean|-c|--list|-l]"
             echo ""
             echo "  ${C_DARK_GRAY}# 更新${C_RESET}"
-            echo "    ${C_GREEN}cc-update${C_RESET}               更新到最新版本"
-            echo "    ${C_GREEN}cc-update 2.1.173${C_RESET}       更新到指定版本"
+            echo "    ${C_GREEN}cc update${C_RESET}                 更新到最新版本"
+            echo "    ${C_GREEN}cc update 2.1.173${C_RESET}         更新到指定版本"
             echo ""
             echo "  ${C_DARK_GRAY}# 查询${C_RESET}"
             echo "    ${C_GREEN}--latest|-L${C_RESET}             查看最新版本号"
@@ -353,4 +353,4 @@ cc-update() {
 # 启动提示
 # ============================================================
 
-echo "${C_DARK_GRAY}[cc-update] 已加载，可用: ${C_GREEN}cc-update [版本|--latest|-L|--rollback|-r|--remove|-rm|--clean|-c|--list|-l]${C_RESET}"
+echo "${C_DARK_GRAY}[cc-update] 已加载，可用: ${C_GREEN}cc update [版本|--latest|-L|--rollback|-r|--remove|-rm|--clean|-c|--list|-l]${C_RESET}"
