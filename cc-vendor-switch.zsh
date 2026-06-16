@@ -137,4 +137,15 @@ _cc_vendor_official() {
 # 启动提示
 # ============================================================
 
+_cc_vendor_help() {
+    echo "用法: ${C_GREEN}cc vendor [name]${C_RESET}"
+    echo ""
+    echo "  ${C_GREEN}cc vendor${C_RESET}         列出当前厂商详情 + 可用厂商"
+    echo "  ${C_GREEN}cc vendor <name>${C_RESET}  切换厂商（应用其 models 字段）"
+    echo "  ${C_GREEN}cc <name>${C_RESET}         同上（快捷）"
+    echo "  ${C_GREEN}cc official${C_RESET}       恢复官方 Anthropic"
+    echo ""
+    echo "厂商在配置文件中定义: vendor.<name>.url/key/models"
+}
+
 echo "${C_DARK_GRAY}[cc-vendor] 已加载，可用: ${C_GREEN}cc vendor <name>${C_RESET}"

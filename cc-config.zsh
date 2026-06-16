@@ -70,6 +70,15 @@ _cc_config_reload() {
     _cc_config_load
 }
 
+_cc_config_help() {
+    echo "用法: ${C_GREEN}cc config <action>${C_RESET}"
+    echo ""
+    echo "  ${C_GREEN}cc config init${C_RESET}     从模板生成配置文件（已有则备份）"
+    echo "  ${C_GREEN}cc config reload${C_RESET}   重载配置文件"
+    echo ""
+    echo "配置文件: ${C_DARK_GRAY}${CC_CONFIG_FILE}${C_RESET}"
+}
+
 # ============================================================
 # 辅助：获取 vendor 字段
 # ============================================================

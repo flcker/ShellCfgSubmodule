@@ -29,32 +29,17 @@ fi
 _cc_help() {
     echo "${C_DARK_GRAY}══ ${C_GREEN}cc${C_RESET} — Claude Code 统一入口 ${C_DARK_GRAY}══${C_RESET}"
     echo ""
-    echo "  ${C_DARK_GRAY}配置${C_RESET}"
-    echo "    ${C_GREEN}cc config init${C_RESET}       生成默认配置文件"
-    echo "    ${C_GREEN}cc config reload${C_RESET}     重载配置文件"
+    echo "  ${C_DARK_GRAY}用法:${C_RESET} cc <command> [args]"
     echo ""
-    echo "  ${C_DARK_GRAY}厂商${C_RESET}"
-    echo "    ${C_GREEN}cc vendor${C_RESET}           列出已配置厂商"
-    echo "    ${C_GREEN}cc vendor <name>${C_RESET}    切换厂商（自动应用默认模型）"
+    echo "  ${C_GREEN}config${C_RESET}    配置管理    ${C_DARK_GRAY}cc help config${C_RESET}"
+    echo "  ${C_GREEN}vendor${C_RESET}    厂商切换    ${C_DARK_GRAY}cc help vendor${C_RESET}"
+    echo "  ${C_GREEN}model${C_RESET}     模型选择    ${C_DARK_GRAY}cc help model${C_RESET}"
+    echo "  ${C_GREEN}update${C_RESET}    版本管理    ${C_DARK_GRAY}cc help update${C_RESET}"
+    echo "  ${C_GREEN}official${C_RESET}  恢复官方"
     echo ""
-    echo "  ${C_DARK_GRAY}模型${C_RESET}"
-    echo "    ${C_GREEN}cc${C_RESET}                 显示当前厂商 + 模型 + 预设列表"
-    echo "    ${C_GREEN}cc model${C_RESET}             同上（显式）"
-    echo "    ${C_GREEN}cc model <name>${C_RESET}        切换预设"
-    echo "    ${C_GREEN}cc model <o> <s> <h>${C_RESET}       Opus/Sonnet/Haiku"
-    echo "    ${C_GREEN}cc model <o> <s> <h> <c>${C_RESET}   Opus/Sonnet/Haiku/Current"
-    echo ""
-    echo "  ${C_DARK_GRAY}快捷${C_RESET}"
-    echo "    ${C_GREEN}cc <vendor>${C_RESET}     cc vendor 别名（依赖配置）"
-    echo "    ${C_GREEN}cc official${C_RESET}     恢复官方 Anthropic"
-    echo ""
-    echo "  ${C_DARK_GRAY}更新管理${C_RESET}"
-    echo "    ${C_GREEN}cc update${C_RESET}                  更新到最新版本"
-    echo "    ${C_GREEN}cc update --latest|-L${C_RESET}      查看最新版本号"
-    echo "    ${C_GREEN}cc update --rollback|-r${C_RESET}    回退到上一版本"
-    echo "    ${C_GREEN}cc update --remove|-rm <ver>${C_RESET} 删除指定版本"
-    echo "    ${C_GREEN}cc update --clean|-c${C_RESET}       清理旧版本（保留当前）"
-    echo "    ${C_GREEN}cc update --list|-l${C_RESET}        列出已安装版本"
+    echo "  ${C_DARK_GRAY}cc <vendor>${C_RESET}       快捷切换厂商"
+    echo "  ${C_DARK_GRAY}cc${C_RESET}                显示当前状态"
+    echo "  ${C_DARK_GRAY}cc help${C_RESET}           显示本页"
 }
 
 # ----- 主入口 ------------------------------------------------------
@@ -119,7 +104,14 @@ cc() {
 
         # 帮助
         help|-h|--help)
-            _cc_help
+            shift
+            case "${1:-}" in
+                config)  _cc_config_help ;;
+                vendor)  _cc_vendor_help ;;
+                model)   _cc_model_help ;;
+                update)  cc-update --help ;;
+                *)       _cc_help ;;
+            esac
             ;;
 
         # 默认显示状态

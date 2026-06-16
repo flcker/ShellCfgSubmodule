@@ -101,4 +101,15 @@ _cc_model_display() {
 # 启动提示
 # ============================================================
 
+_cc_model_help() {
+    echo "用法: ${C_GREEN}cc model [name|o s h [c]]${C_RESET}"
+    echo ""
+    echo "  ${C_GREEN}cc model${C_RESET}              显示 [Vendor] [Current] [Opus] [Sonnet] [Haiku] [Presets]"
+    echo "  ${C_GREEN}cc model <name>${C_RESET}       切换预设（查 vendor.<v>.preset.<name>.*）"
+    echo "  ${C_GREEN}cc model <o> <s> <h>${C_RESET}     自定义 Opus/Sonnet/Haiku"
+    echo "  ${C_GREEN}cc model <o> <s> <h> <c>${C_RESET} 自定义 Opus/Sonnet/Haiku/Current"
+    echo ""
+    echo "预设定义在配置文件中: vendor.<v>.preset.<name>.opus/sonnet/haiku"
+}
+
 echo "${C_DARK_GRAY}[cc-tools] 已加载${C_RESET}"
