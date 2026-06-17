@@ -8,7 +8,7 @@
 #   vendor.<name>.<field>=<value>
 #   models 字段用逗号分隔: opus,sonnet,haiku
 #   # 开头的行视为注释
-#   auto=<vendor>  启动时自动切换
+#   auto=<vendor>[:<preset>]  启动时自动切换
 #
 # 优先级: CC_CONFIG_FILE > ~/.config/cc-tools/cc-tools.conf
 # ============================================================

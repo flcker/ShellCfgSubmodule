@@ -1,6 +1,16 @@
 # ============================================================
 # cc-tools 配置文件加载器 (PowerShell)
 # ============================================================
+# 从 key=value 文本文件加载厂商配置，转为 CC_VENDOR_* 环境变量。
+# 零依赖，zsh / PowerShell 通用格式。
+#
+# 文件格式:
+#   vendor.<name>.<field>=<value>
+#   models 字段用逗号分隔: opus,sonnet,haiku
+#   # 开头的行视为注释
+#   auto=<vendor>[:<preset>]  启动时自动切换
+#
+# 优先级: CC_CONFIG_FILE > ~/.config/cc-tools/cc-tools.conf
 
 if (-not (Test-Path Variable:script:C_DARK_GRAY)) {
     $script:C_DARK_GRAY = "`e[37m"
