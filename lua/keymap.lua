@@ -19,8 +19,10 @@ vim.g.mapleader = " "
 
 -- Save file
 map("n", "<leader>w", ":w<CR>", opts)
--- Quit
+-- Quit（有未保存更改时提示）
 map("n", "<leader>q", ":q<CR>", opts)
+-- Force quit（放弃更改）
+map("n", "<leader>Q", ":q!<CR>", opts)
 -- Save and quit
 map("n", "<leader>wq", ":wq<CR>", opts)
 
