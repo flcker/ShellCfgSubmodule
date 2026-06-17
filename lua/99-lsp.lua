@@ -1,13 +1,12 @@
 -- lsp.lua
--- LSP 配置：mason 管理安装，nvim-lspconfig 配置各语言服务器
+-- LSP 配置：mason 管理安装，vim.lsp.config 配置各语言服务器（nvim 0.11+）
 -- 所有 require 包裹 pcall，插件未安装时静默跳过
 
 local ok_mason, mason = pcall(require, "mason")
 local ok_mlsp, mason_lspconfig = pcall(require, "mason-lspconfig")
-local ok_lcfg, lspconfig = pcall(require, "lspconfig")
 local ok_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
 
-if not ok_mason or not ok_mlsp or not ok_lcfg or not ok_cmp then
+if not ok_mason or not ok_mlsp or not ok_cmp then
     vim.notify("LSP 插件未安装，执行 :Lazy sync 后重启 nvim", vim.log.levels.WARN)
     return
 end
@@ -16,7 +15,7 @@ end
 mason.setup()
 mason_lspconfig.setup({
     ensure_installed = {
-        "tsserver",
+        "ts_ls",
         "pyright",
         "rust_analyzer",
         "clangd",
@@ -46,8 +45,9 @@ local on_attach = function(_, bufnr)
 end
 
 -- 只启动可执行的服务器（系统 PATH 或 mason bin 中存在时）
+-- nvim 0.11+ 使用 vim.lsp.config() 替代 require("lspconfig")
 local servers = {
-    "tsserver",
+    "ts_ls",
     "pyright",
     "rust_analyzer",
     "clangd",
@@ -58,11 +58,19 @@ local servers = {
 }
 
 for _, srv in ipairs(servers) do
-    local ok, cfg = pcall(function() return lspconfig[srv] end)
-    if not ok then goto continue end
-    local default_cmd = cfg.document_config and cfg.document_config.default_config and cfg.document_config.default_config.cmd
-    if default_cmd and vim.fn.executable(default_cmd[1]) == 1 then
-        cfg.setup({ on_attach = on_attach, capabilities = caps })
+    local ok, result = pcall(function()
+        local cfg = vim.lsp.config[srv]
+        if not cfg then return end
+        -- cmd: table = 外部命令, function = 内建 LSP 模块
+        local cmd = type(cfg.cmd) == "function" and cfg.cmd() or cfg.cmd
+        -- 外部分命令需检查可执行性，内建模块直接启用
+        if type(cmd) == "table" and cmd[1] then
+            if vim.fn.executable(cmd[1]) ~= 1 then return end
+        end
+        vim.lsp.config(srv, { on_attach = on_attach, capabilities = caps })
+        vim.lsp.enable(srv)
+    end)
+    if not ok then
+        vim.notify("LSP " .. srv .. " setup failed: " .. tostring(result), vim.log.levels.WARN)
     end
-    ::continue::
 end
