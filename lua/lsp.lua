@@ -1,9 +1,20 @@
 -- lsp.lua
 -- LSP 配置：mason 管理安装，nvim-lspconfig 配置各语言服务器
+-- 所有 require 包裹 pcall，插件未安装时静默跳过
+
+local ok_mason, mason = pcall(require, "mason")
+local ok_mlsp, mason_lspconfig = pcall(require, "mason-lspconfig")
+local ok_lcfg, lspconfig = pcall(require, "lspconfig")
+local ok_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
+
+if not ok_mason or not ok_mlsp or not ok_lcfg or not ok_cmp then
+    vim.notify("LSP 插件未安装，执行 :Lazy sync 后重启 nvim", vim.log.levels.WARN)
+    return
+end
 
 -- mason：LSP 安装管理器（自动安装缺失的服务器）
-require("mason").setup()
-require("mason-lspconfig").setup({
+mason.setup()
+mason_lspconfig.setup({
     ensure_installed = {
         "tsserver",
         "pyright",
@@ -17,8 +28,7 @@ require("mason-lspconfig").setup({
     automatic_installation = true,
 })
 
-local lspconfig = require("lspconfig")
-local caps = require("cmp_nvim_lsp").default_capabilities()
+local caps = cmp_nvim_lsp.default_capabilities()
 
 local on_attach = function(_, bufnr)
     local map = function(k, f) vim.keymap.set("n", k, f, { buffer = bufnr, silent = true }) end
