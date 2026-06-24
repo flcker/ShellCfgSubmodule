@@ -106,12 +106,12 @@ function global:cc {
             $i = 0
             while ($i -lt $Rest.Count) {
                 switch ($Rest[$i]) {
-                    { $_ -in @('--list', '-l') }     { $params['List'] = $true }
-                    { $_ -in @('--rollback', '-r') }  { $params['Rollback'] = $true }
-                    { $_ -in @('--remove', '-rm') }   { if (++$i -lt $Rest.Count) { $params['Remove'] = $Rest[$i] } }
-                    { $_ -in @('--clean', '-c') }     { $params['Clean'] = $true }
-                    { $_ -in @('--latest', '-L') }     { $params['Latest'] = $true }
-                    { $_ -in @('--help', '-h') }       { $params['Help'] = $true }
+                    { $_ -cin @('--list', '-l') }     { $params['List'] = $true }
+                    { $_ -cin @('--rollback', '-r') }  { $params['Rollback'] = $true }
+                    { $_ -cin @('--remove', '-rm') }   { if (++$i -lt $Rest.Count) { $params['Remove'] = $Rest[$i] } }
+                    { $_ -cin @('--clean', '-c') }     { $params['Clean'] = $true }
+                    { $_ -cin @('--latest', '-L') }    { $params['Latest'] = $true }
+                    { $_ -cin @('--help', '-h') }      { $params['Help'] = $true }
                     default { $params['Version'] = $Rest[$i] }
                 }
                 $i++
