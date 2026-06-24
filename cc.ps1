@@ -92,7 +92,7 @@ function global:cc {
         'official' {
             Reset-CCVendorOfficial
         }
-        'help' {
+        { $_ -cin @('help', '-h', '--help') } {
             switch ($Rest[0]) {
                 'config' { Show-CCConfigHelp }
                 'vendor' { Show-CCVendorHelp }
