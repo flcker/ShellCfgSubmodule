@@ -380,9 +380,9 @@ function Invoke-CCUpdate {
         $platform = Get-CCPlatform
         if (-not $platform) { return }
         Write-Host "${C_DARK_GRAY}正在获取最新版本...${C_RESET}"
-        $latest = Get-LatestVersion
-        if (-not $latest) { return }
-        Write-Host "${C_GREEN}最新版本: ${C_CYAN}${latest}${C_RESET}"
+        $latestVer = Get-LatestVersion
+        if (-not $latestVer) { return }
+        Write-Host "${C_GREEN}最新版本: ${C_CYAN}${latestVer}${C_RESET}"
         return
     }
 
