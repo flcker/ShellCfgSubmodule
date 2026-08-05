@@ -52,6 +52,9 @@ _starshipauto_get_path() {
         nerdfontsymbols|nfs)   echo "$static_dir/starship_nerdfontsymbols.toml" ;;
         pastelpowerline|ppl)   echo "$static_dir/starship_pastelpowerline.toml" ;;
         nerdpowerline|npl)     echo "$static_dir/starship_nerdpowerline.toml" ;;
+        p10kr|p10k_rainbow)    echo "$static_dir/starship_p10k_rainbow.toml" ;;
+        p10kc|p10k_classic)    echo "$static_dir/starship_p10k_classic.toml" ;;
+        p10kl|p10k_lean)       echo "$static_dir/starship_p10k_lean.toml" ;;
         default|d)             echo "" ;;
         *)                     return 1 ;;
     esac
@@ -98,7 +101,7 @@ ssc() {
             echo "Static: custom(c) powerline(pl) plaintextsymbols(pts) nerdfontsymbols(nfs)"
             echo "        pastelpowerline(ppl) nerdpowerline(npl) default(d)"
             echo ""
-            echo "Commands: --list --rebuild"
+            echo "Commands: --list --rebuild random(r)"
             echo ""
             echo "Current: $(basename "${STARSHIP_CONFIG:-(default)}" .toml)"
             ;;
@@ -110,14 +113,24 @@ ssc() {
         --rebuild)
             _starshipauto_build
             ;;
+        random|r)
+            export STARSHIP_CONFIG="$(_starshipauto_random_config)"
+            # Re-init starship (detect shell)
+            if [ -n "$ZSH_VERSION" ]; then
+                eval "$(starship init zsh)"
+            else
+                eval "$(starship init bash)"
+            fi
+            echo "Switched to: $(basename "${STARSHIP_CONFIG:-(default)}" .toml)"
+            ;;
         *)
-            local path
-            path="$(_starshipauto_get_path "$1")"
+            local cfg_file
+            cfg_file="$(_starshipauto_get_path "$1")"
             if [ $? -ne 0 ]; then
                 echo "Unknown config: '$1'. Use 'ssc --list' to see available options." >&2
                 return 1
             fi
-            export STARSHIP_CONFIG="$path"
+            export STARSHIP_CONFIG="$cfg_file"
             # Re-init starship (detect shell)
             if [ -n "$ZSH_VERSION" ]; then
                 eval "$(starship init zsh)"
@@ -135,7 +148,7 @@ if [ -n "$BASH_VERSION" ]; then
         local cur="${COMP_WORDS[COMP_CWORD]}"
         local opts="--help --list --rebuild"
         opts="$opts $(_starshipauto_list_configs 2>/dev/null)"
-        opts="$opts p10kr p10kc p10kl custom c powerline pl plaintextsymbols pts nerdfontsymbols nfs pastelpowerline ppl nerdpowerline npl default d"
+        opts="$opts p10kr p10kc p10kl custom c powerline pl plaintextsymbols pts nerdfontsymbols nfs pastelpowerline ppl nerdpowerline npl default d random r"
         COMPREPLY=($(compgen -W "$opts" -- "$cur"))
     }
     complete -F _ssc_completions ssc
@@ -143,7 +156,7 @@ elif [ -n "$ZSH_VERSION" ]; then
     _ssc_completions() {
         local opts=("--help" "--list" "--rebuild")
         opts+=($(_starshipauto_list_configs 2>/dev/null))
-        opts+=("p10kr" "p10kc" "p10kl" "custom" "c" "powerline" "pl" "plaintextsymbols" "pts" "nerdfontsymbols" "nfs" "pastelpowerline" "ppl" "nerdpowerline" "npl" "default" "d")
+        opts+=("p10kr" "p10kc" "p10kl" "custom" "c" "powerline" "pl" "plaintextsymbols" "pts" "nerdfontsymbols" "nfs" "pastelpowerline" "ppl" "nerdpowerline" "npl" "default" "d" "random" "r")
         _describe 'config' opts
     }
     compdef _ssc_completions ssc 2>/dev/null
