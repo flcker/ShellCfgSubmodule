@@ -5,6 +5,14 @@
 # 全部厂商 + 模型映射在 ~/.config/cc-tools/cc-tools.conf 中配置。
 # ============================================================
 
+# 全局追踪数组：记录当前已应用的厂商自定义 env 变量名（vendor.<v>.env.<VAR>）
+# 切换厂商 / cc official 时据此 unset，恢复 Claude 默认行为
+typeset -ga CC_ACTIVE_ENV_VARS
+
+# 全局追踪数组：记录当前已应用的预设自定义 env 变量名（vendor.<v>.preset.<p>.env.<VAR>）
+# 切换预设 / 厂商 / cc official 时据此 unset
+typeset -ga CC_ACTIVE_PRESET_ENV_VARS
+
 # ============================================================
 # 厂商列表
 # ============================================================
@@ -48,6 +56,13 @@ _cc_vendor_list() {
         if [[ ${#presets[@]} -gt 0 ]]; then
             echo "    ${C_DARK_GRAY}presets:${C_CYAN} ${(j:, :)presets}${C_RESET}"
         fi
+
+        local envs=()
+        local env_pre="CC_VENDOR_${upper}_ENV_"
+        for var in ${(Mko)parameters:#${env_pre}*}; do
+            envs+=("${var#$env_pre}=${(P)var}")
+        done
+        (( ${#envs[@]} > 0 )) && echo "    ${C_DARK_GRAY}env:    ${(j:, :)envs}${C_RESET}"
     fi
 
     # 其他可用厂商
@@ -93,6 +108,18 @@ _cc_vendor_switch() {
         return 1
     fi
 
+    # ----- 清理上次厂商应用的自定义 env -----
+    for v in "${CC_ACTIVE_ENV_VARS[@]}"; do
+        [[ -n "$v" ]] && unset "$v"
+    done
+    CC_ACTIVE_ENV_VARS=()
+
+    # 切换厂商会使当前预设的 env 失效
+    for v in "${CC_ACTIVE_PRESET_ENV_VARS[@]}"; do
+        [[ -n "$v" ]] && unset "$v"
+    done
+    CC_ACTIVE_PRESET_ENV_VARS=()
+
     # ----- 应用凭证 -----
     if [[ -n "$url" ]]; then
         export ANTHROPIC_BASE_URL="$url"
@@ -112,6 +139,18 @@ _cc_vendor_switch() {
         echo "${C_GREEN}✓ 厂商: ${C_CYAN}${name}${C_RESET}"
         echo "${C_DARK_GRAY}  未配置 models，使用 cc model <name> 指定组合${C_RESET}"
     fi
+
+    # ----- 应用厂商自定义 env（vendor.<v>.env.<VAR>=<value>，配了才 export）-----
+    local env_prefix="CC_VENDOR_${upper}_ENV_"
+    local _env_names=()
+    for var in ${(Mko)parameters:#${env_prefix}*}; do
+        local real_name="${var#$env_prefix}"
+        export "$real_name"="${(P)var}"
+        CC_ACTIVE_ENV_VARS+=("$real_name")
+        _env_names+=("$real_name=${(P)var}")
+    done
+    (( ${#_env_names[@]} > 0 )) && echo "${C_DARK_GRAY}  env: ${(j:, :)_env_names}${C_RESET}"
+    return 0
 }
 
 # ============================================================
@@ -119,6 +158,18 @@ _cc_vendor_switch() {
 # ============================================================
 
 _cc_vendor_official() {
+    # ----- 清理厂商自定义 env（恢复 Claude 默认）-----
+    for v in "${CC_ACTIVE_ENV_VARS[@]}"; do
+        [[ -n "$v" ]] && unset "$v"
+    done
+    CC_ACTIVE_ENV_VARS=()
+
+    # 清理预设自定义 env
+    for v in "${CC_ACTIVE_PRESET_ENV_VARS[@]}"; do
+        [[ -n "$v" ]] && unset "$v"
+    done
+    CC_ACTIVE_PRESET_ENV_VARS=()
+
     unset ANTHROPIC_BASE_URL
     unset ANTHROPIC_AUTH_TOKEN
     unset ANTHROPIC_MODEL
@@ -145,7 +196,7 @@ _cc_vendor_help() {
     echo "  ${C_GREEN}cc <name>${C_RESET}         同上（快捷）"
     echo "  ${C_GREEN}cc official${C_RESET}       恢复官方 Anthropic"
     echo ""
-    echo "厂商在配置文件中定义: vendor.<name>.url/key/models"
+    echo "厂商在配置文件中定义: vendor.<name>.url/key/models/env"
 }
 
 echo "${C_DARK_GRAY}[cc-vendor] 已加载，可用: ${C_GREEN}cc vendor <name>${C_RESET}"

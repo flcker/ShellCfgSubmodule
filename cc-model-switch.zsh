@@ -53,9 +53,33 @@ _cc_model_switch() {
     local sonnet_key="CC_VENDOR_${(U)vendor}_PRESET_${(U)name}_SONNET"
     local haiku_key="CC_VENDOR_${(U)vendor}_PRESET_${(U)name}_HAIKU"
     if [[ -n "${(P)opus_key}" ]] && [[ -n "${(P)sonnet_key}" ]] && [[ -n "${(P)haiku_key}" ]]; then
+        # ----- 清理上次预设应用的自定义 env -----
+        for v in "${CC_ACTIVE_PRESET_ENV_VARS[@]}"; do
+            [[ -n "$v" ]] && unset "$v"
+        done
+        CC_ACTIVE_PRESET_ENV_VARS=()
+
         local current_key="CC_VENDOR_${(U)vendor}_PRESET_${(U)name}_CURRENT"
         _cc_model_apply "${(P)opus_key}" "${(P)sonnet_key}" "${(P)haiku_key}" "${(P)current_key}"
         echo "${C_GREEN}✓ 预设: ${C_CYAN}${name}${C_DARK_GRAY} → ${(P)opus_key}, ${(P)sonnet_key}, ${(P)haiku_key}${C_RESET}"
+
+        # ----- 重新 apply 厂商 env（恢复被清理卸载的厂商默认值；不重复 track/echo）-----
+        local venv_prefix="CC_VENDOR_${(U)vendor}_ENV_"
+        for var in ${(Mko)parameters:#${venv_prefix}*}; do
+            local vreal="${var#$venv_prefix}"
+            export "$vreal"="${(P)var}"
+        done
+
+        # ----- 应用预设自定义 env（vendor.<v>.preset.<p>.env.<VAR>=<value>，配了才 export）-----
+        local env_prefix="CC_VENDOR_${(U)vendor}_PRESET_${(U)name}_ENV_"
+        local _penv_names=()
+        for var in ${(Mko)parameters:#${env_prefix}*}; do
+            local real="${var#$env_prefix}"
+            export "$real"="${(P)var}"
+            CC_ACTIVE_PRESET_ENV_VARS+=("$real")
+            _penv_names+=("$real=${(P)var}")
+        done
+        (( ${#_penv_names[@]} > 0 )) && echo "${C_DARK_GRAY}  preset env: ${(j:, :)_penv_names}${C_RESET}"
         return 0
     fi
 

@@ -43,6 +43,9 @@ _cc_config_load() {
     fi
 
     local line key value count=0
+
+    # 清理旧版本配置残留的 CC_VENDOR_* 参数，防止删除/重命名行后旧值残留
+    unset -m 'CC_VENDOR_*'
     while IFS='=' read -r key value; do
         # 跳过空行和注释
         [[ -z "$key" || "$key" == \#* ]] && continue

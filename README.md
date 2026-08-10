@@ -119,13 +119,19 @@ cc model heavy       → 在该入口下选 heavy 模型组合
 | `vendor.<name>.url` | URL | API 地址（Claude 官方可省略） |
 | `vendor.<name>.key` | string | API 密钥（必需） |
 | `vendor.<name>.models` | `opus,sonnet,haiku` | 切换厂商时自动应用 |
+| `vendor.<name>.env.<VAR>` | string | 切换时 export 为真实环境变量 VAR（可选；VAR 名大写化） |
 | `vendor.<name>.preset.<n>.opus` | model | 预设 Opus（必需） |
 | `vendor.<name>.preset.<n>.sonnet` | model | 预设 Sonnet（必需） |
 | `vendor.<name>.preset.<n>.haiku` | model | 预设 Haiku（必需） |
 | `vendor.<name>.preset.<n>.current` | model | ANTHROPIC_MODEL（可选，缺省取 opus） |
+| `vendor.<name>.preset.<n>.env.<VAR>` | string | 切换预设时 export 为真实环境变量 VAR（可选；VAR 名大写化） |
 | `auto` | `vendor` 或 `vendor:preset` | 启动自动切换 |
 
 `models` 用逗号分隔三档模型。`preset` 每行为单个模型，以 `opus/sonnet/haiku/current` 后缀区分。
+
+> `CLAUDE_CODE_EFFORT_LEVEL` / `CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING` 在 `cc <vendor>` 时生效，但 `cc model <preset>` 会经 `_cc_model_apply` 重置这两个；若需稳定按厂商设置，避免后续 preset 切换。
+> 预设级 env（`vendor.<v>.preset.<p>.env.<VAR>`）由 `cc model <preset>` 应用，切换预设/厂商或 `cc official` 时 unset。
+> env 值在 `cc model`/`cc vendor` 输出中原样显示，机密请放 `vendor.<name>.key`（已脱敏）而非 `env.<VAR>`（会显示）。
 
 ## 架构
 
