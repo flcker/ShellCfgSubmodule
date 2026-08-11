@@ -56,9 +56,35 @@ function Switch-CCModel {
     $sonnet = (Get-Item "Env:CC_VENDOR_${vUpper}_PRESET_${nUpper}_SONNET" -ErrorAction SilentlyContinue).Value
     $haiku  = (Get-Item "Env:CC_VENDOR_${vUpper}_PRESET_${nUpper}_HAIKU"  -ErrorAction SilentlyContinue).Value
     if ($opus -and $sonnet -and $haiku) {
+        # ----- 清理上次预设应用的自定义 env -----
+        foreach ($v in $global:CC_ACTIVE_PRESET_ENV_VARS) {
+            if ($v) { Remove-Item "Env:$v" -ErrorAction SilentlyContinue }
+        }
+        $global:CC_ACTIVE_PRESET_ENV_VARS = @()
+
         $current = (Get-Item "Env:CC_VENDOR_${vUpper}_PRESET_${nUpper}_CURRENT" -ErrorAction SilentlyContinue).Value
         Set-CCModelApply -Opus $opus -Sonnet $sonnet -Haiku $haiku -Current $current
         Write-Host "${C_GREEN}✓ 预设: ${C_CYAN}${Name}${C_DARK_GRAY} → ${opus}, ${sonnet}, ${haiku}${C_RESET}"
+
+        # ----- 重新 apply 厂商 env（恢复被清理卸载的厂商默认值；不重复 track/echo）-----
+        $venvPrefix = "CC_VENDOR_${vUpper}_ENV_"
+        Get-ChildItem Env: | Where-Object { $_.Name -like "${venvPrefix}*" } | ForEach-Object {
+            $vreal = $_.Name.Substring($venvPrefix.Length)
+            Set-Item -Path "Env:$vreal" -Value $_.Value
+        }
+
+        # ----- 应用预设自定义 env（vendor.<v>.preset.<p>.env.<VAR>=<value>，配了才 export）-----
+        $envPrefix = "CC_VENDOR_${vUpper}_PRESET_${nUpper}_ENV_"
+        $penvNames = @()
+        Get-ChildItem Env: | Where-Object { $_.Name -like "${envPrefix}*" } | ForEach-Object {
+            $real = $_.Name.Substring($envPrefix.Length)
+            Set-Item -Path "Env:$real" -Value $_.Value
+            $global:CC_ACTIVE_PRESET_ENV_VARS += $real
+            $penvNames += "${real}=$($_.Value)"
+        }
+        if ($penvNames.Count -gt 0) {
+            Write-Host "${C_DARK_GRAY}  preset env: $($penvNames -join ', ')${C_RESET}"
+        }
         return $true
     }
 

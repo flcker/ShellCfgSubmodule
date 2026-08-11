@@ -39,6 +39,9 @@ function Import-CCConfig {
         Write-Host "${C_DARK_GRAY}  使用 cc config init 生成模板${C_RESET}"
         return
     }
+    # 清理旧版本配置残留的 CC_VENDOR_* 参数，防止删除/重命名行后旧值残留
+    Get-ChildItem Env: | Where-Object { $_.Name -like 'CC_VENDOR_*' } | Remove-Item -ErrorAction SilentlyContinue
+
     $count = 0
     Get-Content $file | Where-Object { $_ -notmatch '^\s*(#|$)' } | ForEach-Object {
         $k, $v = $_ -split '=', 2
