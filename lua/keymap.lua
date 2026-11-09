@@ -25,6 +25,8 @@ map("n", "<leader>q", ":q<CR>", opts)
 map("n", "<leader>Q", ":q!<CR>", opts)
 -- Save and quit
 map("n", "<leader>wq", ":wq<CR>", opts)
+-- Save and quit（仅在有改动时写盘，等价 :x / ZZ）
+map("n", "<leader>x", ":x<CR>", opts)
 
 -- File Tree
 map("n", "<leader>e", ":NvimTreeToggle<CR>", opts)
@@ -46,3 +48,6 @@ map("n", "<leader><Left>", "<C-w>h", opts)  -- 左
 map("n", "<leader><Down>", "<C-w>j", opts)  -- 下
 map("n", "<leader><Up>", "<C-w>k", opts)    -- 上
 map("n", "<leader><Right>", "<C-w>l", opts) -- 右
+
+-- Y 键行为合理化：默认 Y 等价 yy（整行复制），映射为 y$（从光标复制到行尾，与 D/C 一致）
+map("n", "Y", "y$", opts)
