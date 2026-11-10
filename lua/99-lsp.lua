@@ -23,6 +23,8 @@ mason_lspconfig.setup({
         "lua_ls",
         "bashls",
         "taplo",
+        "jsonls",
+        "yamlls",
     },
     automatic_installation = true,
 })
@@ -55,6 +57,8 @@ local servers = {
     "lua_ls",
     "bashls",
     "taplo",
+    "jsonls",
+    "yamlls",
 }
 
 for _, srv in ipairs(servers) do
