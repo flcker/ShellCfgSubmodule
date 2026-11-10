@@ -18,7 +18,7 @@ $script:LSP_DIR = Split-Path -Parent $MyInvocation.MyCommand.Path
 $script:LSP_CONFIG = Join-Path $script:LSP_DIR "lsp_config.json"
 
 # ── 帮助 ─────────────────────────────────────────────────────
-function Show-LspHelp {
+function global:Show-LspHelp {
     Write-Host ""
     Write-Host "  lsp — LSP 服务器安装与配置管理" -ForegroundColor Cyan
     Write-Host ""
@@ -32,7 +32,7 @@ function Show-LspHelp {
 }
 
 # ── install ──────────────────────────────────────────────────
-function Invoke-LspInstall {
+function global:Invoke-LspInstall {
     $installer = Join-Path $script:LSP_DIR "lsp_install.ps1"
     if (-not (Test-Path $installer)) {
         Write-Error "lsp_install.ps1 not found: $installer"
@@ -42,7 +42,7 @@ function Invoke-LspInstall {
 }
 
 # ── configure ────────────────────────────────────────────────
-function Invoke-LspConfigure {
+function global:Invoke-LspConfigure {
     param([string]$Target = "all")
 
     switch ($Target.ToLower()) {
@@ -62,7 +62,7 @@ function Invoke-LspConfigure {
 }
 
 # ── status ───────────────────────────────────────────────────
-function Show-LspStatus {
+function global:Show-LspStatus {
     if (-not (Test-Path $script:LSP_CONFIG)) {
         Write-Error "lsp_config.json not found: $script:LSP_CONFIG"
         return
