@@ -24,7 +24,7 @@ function global:Show-LspHelp {
     Write-Host ""
     Write-Host "  用法: lsp <command> [args]" -ForegroundColor DarkGray
     Write-Host ""
-    Write-Host "  install                    安装所有 LSP 服务器到系统 PATH" -ForegroundColor Green
+    Write-Host "  install [name]             安装 LSP 服务器到系统 PATH（可指定单个名称）" -ForegroundColor Green
     Write-Host "  configure [zed|vscode|all] 应用编辑器配置（默认 all）" -ForegroundColor Green
     Write-Host "  status                     对比配置与 PATH 已装项" -ForegroundColor Green
     Write-Host "  help                       显示本页" -ForegroundColor Green
@@ -33,12 +33,14 @@ function global:Show-LspHelp {
 
 # ── install ──────────────────────────────────────────────────
 function global:Invoke-LspInstall {
+    param([string]$Name = "")
+
     $installer = Join-Path $script:LSP_DIR "lsp_install.ps1"
     if (-not (Test-Path $installer)) {
         Write-Error "lsp_install.ps1 not found: $installer"
         return
     }
-    & $installer
+    & $installer -OnlyName $Name
 }
 
 # ── configure ────────────────────────────────────────────────
@@ -112,7 +114,8 @@ function global:lsp {
 
     switch ($Sub) {
         'install' {
-            Invoke-LspInstall
+            if ($Rest.Count -ge 1) { Invoke-LspInstall -Name $Rest[0] }
+            else { Invoke-LspInstall }
         }
         'configure' {
             if ($Rest.Count -ge 1) { Invoke-LspConfigure -Target $Rest[0] }

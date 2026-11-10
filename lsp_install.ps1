@@ -1,8 +1,8 @@
 #Requires -Version 7
 # lsp_install.ps1 — 读取 lsp_config.json，将 LSP 服务器安装到系统 PATH（Windows）
-# 用法: pwsh lsp_install.ps1
+# 用法: pwsh lsp_install.ps1 [<name>]
 
-param()
+param([string]$OnlyName = "")
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
@@ -45,6 +45,9 @@ function Install-Via($Mgr, $Pkg) {
     $Cmd = $Cmds[$Mgr]
     Write-Host "  `$ $Cmd" -ForegroundColor DarkGray
     Invoke-Expression $Cmd
+    if ($LASTEXITCODE -ne 0) {
+        throw "installer exited with code $LASTEXITCODE"
+    }
 }
 
 $Results = @()
@@ -53,6 +56,8 @@ foreach ($Entry in $Config.servers.PSObject.Properties) {
     $Name   = $Entry.Name
     $Server = $Entry.Value
     $CmdName = $Server.command
+
+    if ($OnlyName -and $OnlyName -ne $Entry.Name) { continue }
 
     if (Get-Command $CmdName -ErrorAction SilentlyContinue) {
         $Results += [pscustomobject]@{ Status = "✓"; Name = $Name; Note = "already in PATH" }

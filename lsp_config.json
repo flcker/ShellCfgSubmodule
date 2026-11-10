@@ -68,7 +68,7 @@
       "install": {
         "brew": "lua-language-server",
         "apt": "lua-language-server",
-        "winget": "luals.lua-language-server",
+        "winget": "LuaLS.lua-language-server",
         "priority": ["brew", "apt", "winget"]
       }
     },
