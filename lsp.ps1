@@ -79,16 +79,18 @@ function global:Show-LspStatus {
 
     foreach ($Entry in $Config.servers.PSObject.Properties) {
         $Name    = $Entry.Name
-        $CmdName = $Entry.Value.command
+        $Srv     = $Entry.Value
+        $CmdName = $Srv.command
+        $Langs   = if ($Srv.languageIds) { $Srv.languageIds -join ', ' } else { '' }
         $total++
 
         $cmd = Get-Command $CmdName -ErrorAction SilentlyContinue
         if ($cmd) {
             $loc = if ($cmd.Source) { $cmd.Source } else { $cmd.Name }
-            Write-Host ("  ✓  {0,-24} {1}" -f $Name, $loc) -ForegroundColor Green
+            Write-Host ("  ✓  {0,-20} {1,-40} {2}" -f $Name, $Langs, $loc) -ForegroundColor Green
             $installed++
         } else {
-            Write-Host ("  ✗  {0,-24} 未安装" -f $Name) -ForegroundColor Red
+            Write-Host ("  ✗  {0,-20} {1,-40} 未安装" -f $Name, $Langs) -ForegroundColor Red
         }
     }
 
