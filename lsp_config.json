@@ -89,6 +89,22 @@
         "winget": "tamasfe.taplo",
         "priority": ["cargo", "brew", "winget"]
       }
+    },
+    "jsonls": {
+      "command": "vscode-json-languageserver",
+      "languageIds": ["json", "jsonc"],
+      "install": {
+        "npm": "vscode-json-languageserver",
+        "priority": ["npm"]
+      }
+    },
+    "yamlls": {
+      "command": "yaml-language-server",
+      "languageIds": ["yaml"],
+      "install": {
+        "npm": "yaml-language-server",
+        "priority": ["npm"]
+      }
     }
   },
   "vscode_extensions": [
